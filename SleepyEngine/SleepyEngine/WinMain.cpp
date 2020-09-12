@@ -1,12 +1,28 @@
 #include <Windows.h>
+#include "WindowsMessageMap.h"
 
 LRESULT CALLBACK WndProc( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam )
 {
+	static WindowsMessageMap mm;
+	OutputDebugString( mm( msg,lParam,wParam ).c_str() );
+
 	switch ( msg )
 	{
 	case WM_CLOSE:
 		PostQuitMessage( 1 );
 		break;
+	case WM_KEYDOWN:
+		if ( wParam == 'F' )
+		{
+			SetWindowText( hWnd,"Respects" );
+			break;
+		}
+	case WM_KEYUP:
+		if ( wParam == 'F' )
+		{
+			SetWindowText( hWnd,"Nevermind" );
+			break;
+		}
 	}
 	return DefWindowProc( hWnd,msg,wParam,lParam );
 }
@@ -37,7 +53,7 @@ int CALLBACK WinMain(
 	// create window instance
 	HWND hWnd = CreateWindowEx(
 		0,pClassName,
-		"My Window",
+		"Sleepy Engine",
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
 		200,200,640,480,
 		nullptr,nullptr,hInstance,nullptr
