@@ -159,12 +159,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="SleepyException.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="WinMessageMap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Keyboard.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SleepyException.h" />
     <ClInclude Include="SleepyWin.h" />

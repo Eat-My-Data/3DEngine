@@ -1,6 +1,7 @@
 #pragma once
 #include "SleepyWin.h"
 #include "SleepyException.h"
+#include "Keyboard.h"
 
 class Window
 {
@@ -42,6 +43,8 @@ private:
 	static LRESULT CALLBACK HandleMsgSetup( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;
 	static LRESULT WINAPI HandleMsgThunk( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;
 	LRESULT HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;
+public:
+	Keyboard kbd;
 private:
 	int width;
 	int height;

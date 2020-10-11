@@ -16,6 +16,10 @@ int CALLBACK WinMain(
 		{
 			TranslateMessage( &msg );
 			DispatchMessage( &msg );
+			if ( wnd.kbd.KeyIsPressed( VK_MENU ) )
+			{
+				MessageBox( nullptr,"Something Happon!","The alt key was wpressed",MB_OK | MB_ICONEXCLAMATION );
+			}
 		}
 
 		if ( gResult == -1 )
