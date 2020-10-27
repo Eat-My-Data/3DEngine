@@ -71,8 +71,10 @@ Window::Window( int width,int height,const char* name )
 		throw CHWND_LAST_EXCEPT();
 	}
 
-	// show window
+	// newly created windows start off as hidden
 	ShowWindow( hWnd,SW_SHOWDEFAULT	 );
+	// create graphics object
+	pGfx = std::make_unique<Graphics>( hWnd );
 }
 
 Window::~Window()
@@ -86,6 +88,33 @@ void Window::SetTitle( const std::string& title )
 	{
 		throw CHWND_LAST_EXCEPT();
 	}
+}
+
+std::optional<int> Window::ProcessMessages()
+{
+	MSG msg;
+	// while queue has messages, remove and dispatch them ( but do not block on no messages )
+	while ( PeekMessage( &msg,nullptr,0,0,PM_REMOVE ) )
+	{
+		// check for quit because peekmessage does not signal the via return
+		if ( msg.message == WM_QUIT )
+		{
+			// return optional wrapping int ( arg to PostQuitMessage is in wparam )
+			return msg.wParam;
+		}
+
+		// TranslateMessage will post auxillary WM_CHAR messages from key msgs
+		TranslateMessage( &msg );
+		DispatchMessage( &msg );
+	} 
+
+	// return empty optional when not quitting app
+	return {};
+}
+
+Graphics& Window::Gfx()
+{
+	return *pGfx;
 }
 
 LRESULT Window::HandleMsgSetup( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept
