@@ -1,6 +1,6 @@
 #pragma once
-#include "SleepyWin.h"
-#include "SleepyException.h"
+#include "ChiliWin.h"
+#include "ChiliException.h"
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
@@ -10,7 +10,7 @@
 class Window
 {
 public:
-	class Exception : SleepyException
+	class Exception : ChiliException
 	{
 	public:
 		Exception( int line,const char* file,HRESULT hr ) noexcept;

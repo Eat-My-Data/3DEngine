@@ -245,7 +245,7 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 
 Window::Exception::Exception( int line,const char* file,HRESULT hr ) noexcept
 	:
-	SleepyException( line,file ),
+	ChiliException( line,file ),
 	hr( hr )
 {
 }

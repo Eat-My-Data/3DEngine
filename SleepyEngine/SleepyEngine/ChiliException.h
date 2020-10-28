@@ -2,10 +2,10 @@
 #include <exception>
 #include <string>
 
-class SleepyException : public std::exception
+class ChiliException : public std::exception
 {
 public:
-	SleepyException( int line,const char* file ) noexcept;
+	ChiliException( int line,const char* file ) noexcept;
 	const char* what() const noexcept override;
 	virtual const char* GetType() const noexcept;
 	int GetLine() const noexcept;

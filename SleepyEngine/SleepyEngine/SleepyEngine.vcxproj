@@ -24,6 +24,7 @@
     <ProjectGuid>{f8aa7f09-ab73-4c27-a69e-fcac22856be0}</ProjectGuid>
     <RootNamespace>SleepyEngine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>3DEngine</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -164,7 +165,7 @@
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Mouse.cpp" />
-    <ClCompile Include="SleepyException.cpp" />
+    <ClCompile Include="ChiliException.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="WinMessageMap.cpp" />
@@ -176,8 +177,8 @@
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="SleepyException.h" />
-    <ClInclude Include="SleepyWin.h" />
+    <ClInclude Include="ChiliException.h" />
+    <ClInclude Include="ChiliWin.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="WindowsMessageMap.h" />
   </ItemGroup>

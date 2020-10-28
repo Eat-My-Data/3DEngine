@@ -1,14 +1,14 @@
-#include "SleepyException.h"
+#include "ChiliException.h"
 #include <sstream>
 
-SleepyException::SleepyException( int line,const char* file ) noexcept
+ChiliException::ChiliException( int line,const char* file ) noexcept
 	:
 	line( line ),
 	file( file )
 {
 }
 
-const char* SleepyException::what() const noexcept
+const char* ChiliException::what() const noexcept
 {
 	std::ostringstream oss;
 	oss << GetType() << std::endl
@@ -17,22 +17,22 @@ const char* SleepyException::what() const noexcept
 	return whatBuffer.c_str();
 }
 
-const char* SleepyException::GetType() const noexcept
+const char* ChiliException::GetType() const noexcept
 {
 	return "Sleepy Exception";
 }
 
-int SleepyException::GetLine() const noexcept
+int ChiliException::GetLine() const noexcept
 {
 	return line;
 }
 
-const std::string& SleepyException::GetFile() const noexcept
+const std::string& ChiliException::GetFile() const noexcept
 {
 	return file;
 }
 
-std::string SleepyException::GetOriginString() const noexcept
+std::string ChiliException::GetOriginString() const noexcept
 {
 	std::ostringstream oss;
 	oss << "[File] " << file << std::endl
