@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{f8aa7f09-ab73-4c27-a69e-fcac22856be0}</ProjectGuid>
-    <RootNamespace>SleepyEngine</RootNamespace>
+    <RootNamespace>3DEngine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>3DEngine</ProjectName>
   </PropertyGroup>
@@ -183,7 +183,7 @@
     <ClInclude Include="WindowsMessageMap.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="SleepyEngine.rc" />
+    <ResourceCompile Include="3DEngine.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon1.ico" />
