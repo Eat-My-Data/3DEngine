@@ -73,6 +73,10 @@ Graphics::Graphics( HWND hWnd )
 
 Graphics::~Graphics()
 {
+	if ( pTarget != nullptr )
+	{
+		pTarget->Release();
+	}
 	if ( pContext != nullptr )
 	{
 		pContext->Release();
