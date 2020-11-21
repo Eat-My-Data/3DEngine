@@ -98,7 +98,7 @@ void Graphics::ClearBuffer( float red,float green,float blue ) noexcept
 	pContext->ClearRenderTargetView( pTarget.Get(),color );
 }
 
-void Graphics::DrawTestTriangle()
+void Graphics::DrawTestTriangle( float angle )
 {
 	namespace wrl = Microsoft::WRL;
 
@@ -120,6 +120,7 @@ void Graphics::DrawTestTriangle()
 		} color;
 	};
 
+
 	// create vertex buffer (1 2d triangle at center of screen)
 	Vertex vertices[] =
 	{
@@ -128,7 +129,7 @@ void Graphics::DrawTestTriangle()
 		{ -0.5f,-0.5f,0,0,255,0  },
 		{ -0.3f,0.3f,0,255,0,0  },
 		{ 0.3f,0.3f,0,0,255,0  },
-		{ 0.0f,-0.8f,255,0,0,0 },
+		{ 0.0f,-1.0f,255,0,0,0 },
 	};
 	vertices[0].color.g = 255;
 	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
@@ -143,10 +144,11 @@ void Graphics::DrawTestTriangle()
 	sd.pSysMem = vertices;
 	GFX_THROW_INFO( pDevice->CreateBuffer( &bd,&sd,&pVertexBuffer ) );
 
-	// Bind vertex buffer to pipeline
+	// bind vertex buffer to pipeline
 	const UINT stride = sizeof( Vertex );
 	const UINT offset = 0u;
 	pContext->IASetVertexBuffers( 0u,1u,pVertexBuffer.GetAddressOf(),&stride,&offset );
+
 
 	// create index buffer
 	const unsigned short indices[] =
@@ -171,6 +173,39 @@ void Graphics::DrawTestTriangle()
 	// bind index buffer
 	pContext->IASetIndexBuffer( pIndexBuffer.Get(),DXGI_FORMAT_R16_UINT,0u );
 
+
+	// create constant buffer for tranformation matrix
+	struct ConstantBuffer
+	{
+		struct 
+		{
+			float element[4][4];
+		} transformation;
+	};
+	const ConstantBuffer cb =
+	{
+		{
+			( 3.0f / 4.0f ) * std::cos( angle ),	std::sin( angle ),	0.0f,	0.0f,
+			( 3.0f / 4.0f ) * -std::sin( angle ),	std::cos( angle ),	0.0f,	0.0f,
+			0.0f,				0.0f,				1.0f,	0.0f,
+			0.0f,				0.0f,				0.0f,	1.0f,	
+		}
+	};
+	wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
+	D3D11_BUFFER_DESC cbd = {};
+	cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbd.Usage = D3D11_USAGE_DYNAMIC;
+	cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbd.MiscFlags = 0u;
+	cbd.ByteWidth = sizeof( cb );
+	cbd.StructureByteStride = 0u;
+	D3D11_SUBRESOURCE_DATA csd = {};
+	csd.pSysMem = &cb;
+	GFX_THROW_INFO( pDevice->CreateBuffer( &cbd,&csd,&pConstantBuffer ) );
+
+	// bind constant buffer to vertex shader
+	pContext->VSSetConstantBuffers( 0u,1u,pConstantBuffer.GetAddressOf() );
+
 	// create pixel shader
 	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
 	wrl::ComPtr<ID3DBlob> pBlob;
@@ -180,6 +215,7 @@ void Graphics::DrawTestTriangle()
 	// bind pixel shader
 	pContext->PSSetShader( pPixelShader.Get(),nullptr,0u );
 
+
 	// create vertex shader
 	wrl::ComPtr<ID3D11VertexShader> pVertexShader;
 	GFX_THROW_INFO( D3DReadFileToBlob( L"VertexShader.cso",&pBlob ) );
@@ -188,7 +224,8 @@ void Graphics::DrawTestTriangle()
 	// bind vertex shader
 	pContext->VSSetShader( pVertexShader.Get(),nullptr,0u );
 
-	// input (vertex) layout (2d position only)
+
+	// create input (vertex) layout (2d position only)
 	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
 	const D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
@@ -219,6 +256,10 @@ void Graphics::DrawTestTriangle()
 	// draw to screen
 	GFX_THROW_INFO_ONLY( pContext->DrawIndexed( (UINT)std::size( indices ),0u,0u ) );
 }
+
+
+//================================= EXCEPTIONS =================================//
+
 
 Graphics::HrException::HrException( int line,const char* file,HRESULT hr,std::vector<std::string> infoMsgs ) noexcept
 	:
@@ -277,11 +318,6 @@ std::string Graphics::HrException::GetErrorDescription() const noexcept
 	return buf;
 }
 
-const char* Graphics::DeviceRemovedException::GetType() const noexcept
-{
-	return "Chili Graphics Exception [Device Removed] (DXGI_ERROR_DEVICE_REMOVED)";
-}
-
 std::string Graphics::HrException::GetErrorInfo() const noexcept
 {
 	return info;
@@ -322,4 +358,9 @@ const char* Graphics::InfoException::GetType() const noexcept
 std::string Graphics::InfoException::GetErrorInfo() const noexcept
 {
 	return info;
+}
+
+const char* Graphics::DeviceRemovedException::GetType() const noexcept
+{
+	return "Chili Graphics Exception [Device Removed] (DXGI_ERROR_DEVICE_REMOVED)";
 }
