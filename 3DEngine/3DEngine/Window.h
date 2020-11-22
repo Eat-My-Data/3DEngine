@@ -33,7 +33,7 @@ public:
 		using Exception::Exception;
 		const char* GetType() const noexcept override;
 	};
-private: 
+private:
 	// singleton manages registration/cleanup of window class
 	class WindowClass
 	{
@@ -70,9 +70,3 @@ private:
 	HWND hWnd;
 	std::unique_ptr<Graphics> pGfx;
 };
-
-
-// error exception helper macros
-#define CHWND_EXCEPT( hr ) Window::HrException( __LINE__,__FILE__,(hr) )
-#define CHWND_LAST_EXCEPT() Window::HrException( __LINE__,__FILE__,GetLastError() )
-#define CHWND_NOGFX_EXCEPT() Window::NoGfxException( __LINE__,__FILE__ ) 
