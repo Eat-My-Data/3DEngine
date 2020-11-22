@@ -1,15 +1,15 @@
-#include "Box.h"
+#include "Pyramid.h"
 #include "BindableBase.h"
 #include "GraphicsThrowMacros.h"
-#include "Cube.h"
+#include "Cone.h"
 
-Box::Box( Graphics& gfx,
+
+Pyramid::Pyramid( Graphics& gfx,
 	std::mt19937& rng,
 	std::uniform_real_distribution<float>& adist,
 	std::uniform_real_distribution<float>& ddist,
 	std::uniform_real_distribution<float>& odist,
-	std::uniform_real_distribution<float>& rdist,
-	std::uniform_real_distribution<float>& bdist )
+	std::uniform_real_distribution<float>& rdist )
 	:
 	r( rdist( rng ) ),
 	droll( ddist( rng ) ),
@@ -29,56 +29,39 @@ Box::Box( Graphics& gfx,
 		struct Vertex
 		{
 			dx::XMFLOAT3 pos;
+			struct
+			{
+				unsigned char r;
+				unsigned char g;
+				unsigned char b;
+				unsigned char a;
+			} color;
 		};
-		const auto model = Cube::Make<Vertex>();
+		auto model = Cone::MakeTesselated<Vertex>( 4 );
+		// set vertex colors for mesh
+		model.vertices[0].color = { 255,255,0 };
+		model.vertices[1].color = { 255,255,0 };
+		model.vertices[2].color = { 255,255,0 };
+		model.vertices[3].color = { 255,255,0 };
+		model.vertices[4].color = { 255,255,80 };
+		model.vertices[5].color = { 255,10,0 };
+		// deform mesh linearly
+		model.Transform( dx::XMMatrixScaling( 1.0f,1.0f,0.7f ) );
 
 		AddStaticBind( std::make_unique<VertexBuffer>( gfx,model.vertices ) );
 
-		auto pvs = std::make_unique<VertexShader>( gfx,L"ColorIndexVS.cso" );
+		auto pvs = std::make_unique<VertexShader>( gfx,L"ColorBlendVS.cso" );
 		auto pvsbc = pvs->GetBytecode();
 		AddStaticBind( std::move( pvs ) );
 
-		AddStaticBind( std::make_unique<PixelShader>( gfx,L"ColorIndexPS.cso" ) );
+		AddStaticBind( std::make_unique<PixelShader>( gfx,L"ColorBlendPS.cso" ) );
 
-		const std::vector<unsigned short> indices =
-		{
-			0,2,1, 2,3,1,
-			1,3,5, 3,7,5,
-			2,6,3, 3,6,7,
-			4,5,7, 4,7,6,
-			0,4,2, 2,4,6,
-			0,1,4, 1,5,4
-		};
-		AddStaticIndexBuffer( std::make_unique<IndexBuffer>( gfx,indices ) );
-
-		struct PixelShaderConstants
-		{
-			struct
-			{
-				float r;
-				float g;
-				float b;
-				float a;
-			} face_colors[8];
-		};
-		const PixelShaderConstants cb2 =
-		{
-			{
-				{ 1.0f,1.0f,1.0f },
-				{ 1.0f,0.0f,0.0f },
-				{ 0.0f,1.0f,0.0f },
-				{ 1.0f,1.0f,0.0f },
-				{ 0.0f,0.0f,1.0f },
-				{ 1.0f,0.0f,1.0f },
-				{ 0.0f,1.0f,1.0f },
-				{ 0.0f,0.0f,0.0f },
-			}
-		};
-		AddStaticBind( std::make_unique<PixelConstantBuffer<PixelShaderConstants>>( gfx,cb2 ) );
+		AddStaticIndexBuffer( std::make_unique<IndexBuffer>( gfx,model.indices ) );
 
 		const std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
 		{
 			{ "Position",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 },
+			{ "Color",0,DXGI_FORMAT_R8G8B8A8_UNORM,0,12,D3D11_INPUT_PER_VERTEX_DATA,0 },
 		};
 		AddStaticBind( std::make_unique<InputLayout>( gfx,ied,pvsbc ) );
 
@@ -90,14 +73,9 @@ Box::Box( Graphics& gfx,
 	}
 
 	AddBind( std::make_unique<TransformCbuf>( gfx,*this ) );
-
-	dx::XMStoreFloat3x3(
-		&mt,
-		dx::XMMatrixScaling( 1.0f,1.0f,bdist( rng ) )
-	);
 }
 
-void Box::Update( float dt ) noexcept
+void Pyramid::Update( float dt ) noexcept
 {
 	roll += droll * dt;
 	pitch += dpitch * dt;
@@ -107,11 +85,10 @@ void Box::Update( float dt ) noexcept
 	chi += dchi * dt;
 }
 
-DirectX::XMMATRIX Box::GetTransformXM() const noexcept
+DirectX::XMMATRIX Pyramid::GetTransformXM() const noexcept
 {
 	namespace dx = DirectX;
-	return dx::XMLoadFloat3x3( &mt ) *
-		dx::XMMatrixRotationRollPitchYaw( pitch,yaw,roll ) *
+	return dx::XMMatrixRotationRollPitchYaw( pitch,yaw,roll ) *
 		dx::XMMatrixTranslation( r,0.0f,0.0f ) *
 		dx::XMMatrixRotationRollPitchYaw( theta,phi,chi ) *
 		dx::XMMatrixTranslation( 0.0f,0.0f,20.0f );
