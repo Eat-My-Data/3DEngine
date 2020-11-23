@@ -150,6 +150,8 @@ DirectX::XMMATRIX Graphics::GetProjection() const noexcept
 {
 	return projection;
 }
+
+
 //================================= EXCEPTIONS =================================//
 
 
