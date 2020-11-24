@@ -123,8 +123,11 @@
     <ClCompile Include="Sampler.cpp">
       <Filter>Source Files\Bindable</Filter>
     </ClCompile>
+    <ClCompile Include="SkinnedBox.cpp">
+      <Filter>Source Files\Drawable</Filter>
+    </ClCompile>
     <ClCompile Include="Sheet.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Drawable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -251,6 +254,9 @@
     <ClInclude Include="Sheet.h">
       <Filter>Header Files\Drawable</Filter>
     </ClInclude>
+    <ClInclude Include="SkinnedBox.h">
+      <Filter>Header Files\Drawable</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="3DEngine.rc">
@@ -262,6 +268,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Images\kappa50.png">
+      <Filter>Images</Filter>
+    </Image>
+    <Image Include="Images\cube.png">
       <Filter>Images</Filter>
     </Image>
   </ItemGroup>
