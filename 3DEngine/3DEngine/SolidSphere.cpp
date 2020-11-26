@@ -52,14 +52,14 @@ SolidSphere::SolidSphere( Graphics& gfx,float radius )
 }
 
 void SolidSphere::Update( float dt ) noexcept
-{
-}
+{}
 
 void SolidSphere::SetPos( DirectX::XMFLOAT3 pos ) noexcept
 {
+	this->pos = pos;
 }
 
 DirectX::XMMATRIX SolidSphere::GetTransformXM() const noexcept
 {
-	return DirectX::XMMATRIX();
+	return DirectX::XMMatrixTranslation( pos.x,pos.y,pos.z );
 }
