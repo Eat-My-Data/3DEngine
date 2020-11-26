@@ -83,7 +83,7 @@ void Keyboard::OnKeyPressed( unsigned char keycode ) noexcept
 
 void Keyboard::OnKeyReleased( unsigned char keycode ) noexcept
 {
-    keystates[keycode] = true;
+    keystates[keycode] = false;
     keybuffer.push( Keyboard::Event( Keyboard::Event::Type::Release,keycode ) );
     TrimBuffer( keybuffer );
 }

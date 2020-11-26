@@ -4,7 +4,8 @@
 #include "WindowsThrowMacros.h"
 #include "imgui/imgui_impl_win32.h"
 
-// Window Class Stuff
+
+//================================= WINDOW CLASS =================================//
 Window::WindowClass Window::WindowClass::wndClass;
 
 Window::WindowClass::WindowClass() noexcept
@@ -43,7 +44,8 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
 	return wndClass.hInst;
 }
 
-// Window Stuff
+
+//================================= WINDOW =================================//
 Window::Window( int width,int height,const char* name )
 	:
 	width( width ),
@@ -305,6 +307,8 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 	return DefWindowProc( hWnd,msg,wParam,lParam );
 }
 
+
+//================================= EXCEPTIONS =================================//
 Window::HrException::HrException( int line,const char* file,HRESULT hr ) noexcept
 	:
 	Exception( line,file ),

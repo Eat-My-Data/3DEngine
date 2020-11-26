@@ -45,7 +45,7 @@ private:
 		~WindowClass();
 		WindowClass( const WindowClass& ) = delete;
 		WindowClass& operator=( const WindowClass& ) = delete;
-		static constexpr const char* wndClassName = "Sleepy Direct3D Engine Window";
+		static constexpr const char* wndClassName = "Direct3D Engine Window";
 		static WindowClass wndClass;
 		HINSTANCE hInst;
 	};
