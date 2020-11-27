@@ -83,7 +83,6 @@ void App::DoFrame()
 App::~App()
 {}
 
-
 int App::Go()
 {
 	while ( true )

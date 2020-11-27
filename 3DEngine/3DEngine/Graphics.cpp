@@ -198,8 +198,6 @@ bool Graphics::IsImguiEnabled() const noexcept
 
 
 //================================= EXCEPTIONS =================================//
-
-
 Graphics::HrException::HrException( int line,const char* file,HRESULT hr,std::vector<std::string> infoMsgs ) noexcept
 	:
 	Exception( line,file ),
