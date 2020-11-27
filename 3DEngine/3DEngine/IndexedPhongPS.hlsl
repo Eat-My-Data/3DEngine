@@ -12,6 +12,7 @@ cbuffer LightCBuf
 cbuffer ObjectCBuf
 {
     float3 materialColors[6];
+    float padding;
     float specularIntensity;
     float specularPower;
 };
