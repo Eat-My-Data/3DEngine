@@ -63,15 +63,18 @@ Box::Box( Graphics& gfx,
 
 	struct PSMaterialConstant
 	{
-		dx::XMFLOAT3 color;
-		float padding;
+		alignas(16) dx::XMFLOAT3 color;
+		float specularIntensity = 0.6f;
+		float specularPower = 30.0f;
+		float padding[2];
 	} colorConst;
 	colorConst.color = material;
-	AddBind(std::make_unique<PixelConstantBuffer<PSMaterialConstant>>(gfx, colorConst, 1u) );
+	AddBind(std::make_unique<PixelConstantBuffer<PSMaterialConstant>>(gfx, colorConst, 1u));
 
+	// model deformation transform (per instance, not stored as bind)
 	dx::XMStoreFloat3x3(
 		&mt,
-		dx::XMMatrixScaling( 1.0f,1.0f,bdist( rng ) )
+		dx::XMMatrixScaling( 1.0f,1.0f,bdist(rng) )
 	);
 }
 
