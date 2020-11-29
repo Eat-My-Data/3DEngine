@@ -385,6 +385,12 @@
     <FxCompile Include="BlendedPhongVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="TexturedPhongPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="TexturedPhongVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="imgui.natvis">
