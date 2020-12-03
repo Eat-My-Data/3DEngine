@@ -264,7 +264,6 @@
     <Image Include="Images\kappa50.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="cpp.hint" />
     <None Include="DXGetErrorDescription.inl" />
     <None Include="DXGetErrorString.inl" />
     <None Include="DXTrace.inl" />

@@ -350,7 +350,6 @@
     <None Include="DXTrace.inl">
       <Filter>Dxerr</Filter>
     </None>
-    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PhongPS.hlsl">
