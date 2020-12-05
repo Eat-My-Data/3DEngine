@@ -12,18 +12,18 @@ namespace Bind
 class Drawable
 {
 	template<class T>
-	friend class DrawableBase;
+	friend class DrawableBase;											// drawable base for common attributes
 public:
 	Drawable() = default;
 	Drawable( const Drawable& ) = delete;
-	virtual DirectX::XMMATRIX GetTransformXM() const noexcept = 0;
-	void Draw( Graphics& gfx ) const noxnd;
-	virtual void Update( float dt ) noexcept
+	virtual DirectX::XMMATRIX GetTransformXM() const noexcept = 0;		// virtual getter for transform matrix
+	void Draw( Graphics& gfx ) const noxnd;								// binds all attributes to model, and calls DrawIndexed
+	virtual void Update( float dt ) noexcept							// virtual update for drawable
 	{}
-	virtual ~Drawable() = default;
+	virtual ~Drawable() = default;										// esure destruction of derived class
 protected:
 	template<class T>
-	T* QueryBindable() noexcept
+	T* QueryBindable() noexcept											// find bindable of type T
 	{
 		for( auto& pb : binds )
 		{
@@ -34,11 +34,11 @@ protected:
 		}
 		return nullptr;
 	}
-	void AddBind( std::unique_ptr<Bind::Bindable> bind ) noxnd;
-	void AddIndexBuffer( std::unique_ptr<Bind::IndexBuffer> ibuf ) noxnd;
+	void AddBind( std::unique_ptr<Bind::Bindable> bind ) noxnd;				// add drawable specific bind
+	void AddIndexBuffer( std::unique_ptr<Bind::IndexBuffer> ibuf ) noxnd;	// add index buffer
 private:
-	virtual const std::vector<std::unique_ptr<Bind::Bindable>>& GetStaticBinds() const noexcept = 0;
+	virtual const std::vector<std::unique_ptr<Bind::Bindable>>& GetStaticBinds() const noexcept = 0;	// returns common drawable attributes
 private:
-	const Bind::IndexBuffer* pIndexBuffer = nullptr;
-	std::vector<std::unique_ptr<Bind::Bindable>> binds;
+	const Bind::IndexBuffer* pIndexBuffer = nullptr;						// pointer to index buffer
+	std::vector<std::unique_ptr<Bind::Bindable>> binds;						// container of bindables
 };
