@@ -32,21 +32,10 @@ void App::DoFrame()
 	// imgui windows
 	cam.SpawnControlWindow();
 	light.SpawnControlWindow();
-	ShowImguiDemoWindow();
 	nano.ShowWindow( "Nanosuit" );
 
 	// present
 	wnd.Gfx().EndFrame();
-}
-
-void App::ShowImguiDemoWindow()
-{
-	static bool show_demo_window = true;
-	if ( show_demo_window )
-	{
-		using namespace std::string_literals;
-		ImGui::ShowDemoWindow( &show_demo_window );
-	}
 }
 
 App::~App()

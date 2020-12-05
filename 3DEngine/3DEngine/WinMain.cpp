@@ -8,19 +8,19 @@ int CALLBACK WinMain(
 {
 	try
 	{
-		return App{}.Go();
+		return App{}.Go();				// start application
 	}
-	catch ( const ChiliException& e )
+	catch ( const ChiliException& e )	// catch custom exceptions
 	{
-		MessageBox( nullptr,e.what(),e.GetType(),MB_OK | MB_ICONEXCLAMATION );
+		MessageBox( nullptr,e.what(),e.GetType(),MB_OK | MB_ICONEXCLAMATION ); 
 	}
-	catch ( std::exception& e )
+	catch ( std::exception& e )			// catch standard exceptions
 	{
-		MessageBox( nullptr,e.what(),"Standard Exception",MB_OK | MB_ICONEXCLAMATION );
+		MessageBox( nullptr,e.what(),"Standard Exception",MB_OK | MB_ICONEXCLAMATION ); 
 	}
-	catch ( ... )
+	catch ( ... )						// catch everything else
 	{
-		MessageBox( nullptr,"No details available","Unknown Exception",MB_OK | MB_ICONEXCLAMATION );
+		MessageBox( nullptr,"No details available","Unknown Exception",MB_OK | MB_ICONEXCLAMATION ); 
 	}
 	return -1;
 }
