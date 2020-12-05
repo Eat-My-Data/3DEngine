@@ -18,7 +18,7 @@ namespace Bind
 
 class Graphics
 {
-	friend class Bind::Bindable;
+	friend class Bind::Bindable;									// need to access binable protected functions
 public:
 	class Exception : public ChiliException
 	{
@@ -57,30 +57,30 @@ public:
 		std::string reason;
 	};
 public:
-	Graphics( HWND hWnd );
+	Graphics( HWND hWnd );											// initializes pDevice, pSwap, pContext, pTarget, pDSV, and ImGui
 	Graphics( const Graphics& ) = delete;
 	Graphics& operator=( const Graphics& ) = delete;
 	~Graphics() = default;
-	void EndFrame();
-	void BeginFrame( float red,float green,float blue ) noexcept;
-	void DrawIndexed( UINT count )  noxnd;
-	void SetProjection( DirectX::FXMMATRIX proj ) noexcept;
-	DirectX::XMMATRIX GetProjection() const noexcept;
-	void SetCamera( DirectX::FXMMATRIX cam ) noexcept;
-	DirectX::XMMATRIX GetCamera() const noexcept;
-	void EnableImgui() noexcept;
-	void DisableImgui() noexcept;
-	bool IsImguiEnabled() const noexcept;
+	void EndFrame();												// render screen
+	void BeginFrame( float red,float green,float blue ) noexcept;	// set up frame
+	void DrawIndexed( UINT count )  noxnd;							// draw indexed, non-instanced primitives
+	void SetProjection( DirectX::FXMMATRIX proj ) noexcept;			// setter for projection
+	DirectX::XMMATRIX GetProjection() const noexcept;				// getter for projection
+	void SetCamera( DirectX::FXMMATRIX cam ) noexcept;				// setter for camera
+	DirectX::XMMATRIX GetCamera() const noexcept;					// getter for camera
+	void EnableImgui() noexcept;									
+	void DisableImgui() noexcept;									
+	bool IsImguiEnabled() const noexcept;							// get imguiEnabled
 private:
-	DirectX::XMMATRIX projection;
-	DirectX::XMMATRIX camera;
-	bool imguiEnabled = true;
+	DirectX::XMMATRIX projection;									// projection matrix
+	DirectX::XMMATRIX camera;										// camera matrix
+	bool imguiEnabled = true;										// allows for configuring objects
 #ifndef NDEBUG
-	DxgiInfoManager infoManager;
+	DxgiInfoManager infoManager;									// allows for directx error macros
 #endif
-	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
-	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwap;
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
+	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;					// pointer to device 
+	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwap;					// pointer to swap chain
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;			// pointer to device context
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;			// pointer to render target view
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;			// poitner to depth stencil view
 };
