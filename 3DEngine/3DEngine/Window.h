@@ -10,7 +10,7 @@
 class Window
 {
 public:
-	class Exception : public ChiliException
+	class Exception : public ChiliException	
 	{
 		using ChiliException::ChiliException;
 	public:
@@ -34,39 +34,38 @@ public:
 		const char* GetType() const noexcept override;
 	};
 private:
-	// singleton manages registration/cleanup of window class
-	class WindowClass
+	class WindowClass																
 	{
 	public:
-		static const char* GetName() noexcept;
-		static HINSTANCE GetInstance() noexcept;
+		static const char* GetName() noexcept; 										// getter for windowClassName
+		static HINSTANCE GetInstance() noexcept;									// getter for hInst
 	private:
 		WindowClass() noexcept;
-		~WindowClass();
-		WindowClass( const WindowClass& ) = delete;
+		~WindowClass();																// manages window registration
+		WindowClass( const WindowClass& ) = delete;									// cleans up window class
 		WindowClass& operator=( const WindowClass& ) = delete;
-		static constexpr const char* wndClassName = "Direct3D Engine Window";
-		static WindowClass wndClass;
-		HINSTANCE hInst;
+		static constexpr const char* wndClassName = "Direct3D Engine Window";		// window class name
+		static WindowClass wndClass;												// window class object
+		HINSTANCE hInst;															// handle to hInstance from WinMain
 	};
 public:
-	Window( int width,int height,const char* name );
+	Window( int width,int height,const char* name );								// creates the window, initializes imgui and creates graphics object
 	~Window();
 	Window( const Window& ) = delete;
 	Window& operator=( const Window& ) = delete;
-	void SetTitle( const std::string& title );
-	static std::optional<int> ProcessMessages() noexcept;
-	Graphics& Gfx();
+	void SetTitle( const std::string& title );										// setter window title
+	static std::optional<int> ProcessMessages() noexcept;							// message pump
+	Graphics& Gfx();																// gives access to graphics pointer
 private:
-	static LRESULT CALLBACK HandleMsgSetup( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;
-	static LRESULT WINAPI HandleMsgThunk( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;
-	LRESULT HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;
+	static LRESULT CALLBACK HandleMsgSetup( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;	// handles initial window creation
+	static LRESULT WINAPI HandleMsgThunk( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;	// forwards to HandleMsg
+	LRESULT HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;						// window message processor
 public:
-	Keyboard kbd;
-	Mouse mouse;
+	Keyboard kbd;																	// 	keyboard interface
+	Mouse mouse;																	// 	mouse interface
 private:
-	int width;
-	int height;
-	HWND hWnd;
-	std::unique_ptr<Graphics> pGfx;
+	int width;																		// 	window width
+	int height;																		// 	window height
+	HWND hWnd;																		// 	window object
+	std::unique_ptr<Graphics> pGfx;													// 	pointer to graphics object
 };
