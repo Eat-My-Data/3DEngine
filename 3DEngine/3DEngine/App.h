@@ -22,5 +22,5 @@ private:
 	float speed_factor = 1.0f;							// time manipulation
 	Camera cam;											// configurable view matrix
 	PointLight light;									// configurable light source
-	Model nano{ wnd.Gfx(),"Models\\nanosuit.obj" };		// external tool assimp for model loading
+	Model nano{ wnd.Gfx(),"Models\\boxy.gltf" };		// external tool assimp for model loading
 };

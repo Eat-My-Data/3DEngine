@@ -1,6 +1,7 @@
 #include "Mesh.h"
 #include "imgui/imgui.h"
 #include <unordered_map>
+#include <sstream>
 
 namespace dx = DirectX;
 
@@ -83,20 +84,23 @@ void Node::ShowTree( int& nodeIndexTracked,std::optional<int>& selectedIndex,Nod
 	// build up flags for current node
 	const auto node_flags = ImGuiTreeNodeFlags_OpenOnArrow
 		| ((currentNodeIndex == selectedIndex.value_or(-1)) ? ImGuiTreeNodeFlags_Selected : 0 )
-		| ((childPtrs.size() == 0) ? ImGuiTreeNodeFlags_Leaf : 0);
-
-	// if tree node expanded, recursively render all children
-	if( ImGui::TreeNodeEx( (void*)(intptr_t)currentNodeIndex,node_flags,name.c_str() ) )
+		| ((childPtrs.size() == 0) ? ImGuiTreeNodeFlags_Leaf : 0 );
+	// render this node
+	const auto expanded = ImGui::TreeNodeEx( 
+		(void*)(intptr_t)currentNodeIndex,node_flags,name.c_str() 
+	);
+	// processing for selecting node
+	if ( ImGui::IsItemClicked() )
 	{
-		if (ImGui::IsItemClicked())
-		{
-			selectedIndex = currentNodeIndex;
-			pSelectedNode = const_cast<Node*>(this);
-		}
+		selectedIndex = currentNodeIndex;
+		pSelectedNode = const_cast<Node*>(this);
+	}
 
-		for( const auto& pChild : childPtrs )
+	if ( expanded )
+	{
+		for (const auto& pChild : childPtrs)
 		{
-			pChild->ShowTree( nodeIndexTracked,selectedIndex,pSelectedNode );
+			pChild->ShowTree(nodeIndexTracked, selectedIndex, pSelectedNode);
 		}
 		ImGui::TreePop();
 	}
@@ -167,8 +171,15 @@ Model::Model( Graphics& gfx,const std::string fileName )
 	Assimp::Importer imp;
 	const auto pScene = imp.ReadFile( fileName.c_str(),
 		aiProcess_Triangulate |
-		aiProcess_JoinIdenticalVertices
+		aiProcess_JoinIdenticalVertices |
+		aiProcess_ConvertToLeftHanded |
+		aiProcess_GenNormals
 	);
+
+	if ( pScene == nullptr )
+	{
+		throw ModelException( __LINE__,__FILE__,imp.GetErrorString() );
+	}
 
 	for( size_t i = 0; i < pScene->mNumMeshes; i++ )
 	{
@@ -249,6 +260,7 @@ std::unique_ptr<Mesh> Model::ParseMesh( Graphics& gfx,const aiMesh& mesh )
 
 	return std::make_unique<Mesh>( gfx,std::move( bindablePtrs ) );
 }
+
 std::unique_ptr<Node> Model::ParseNode( const aiNode& node ) noexcept
 {
 	const auto transform = dx::XMMatrixTranspose( dx::XMLoadFloat4x4(
@@ -270,4 +282,30 @@ std::unique_ptr<Node> Model::ParseNode( const aiNode& node ) noexcept
 	}
 
 	return pNode;
+}
+
+//================================= EXCEPTIONS =================================//
+ModelException::ModelException(int line, const char* file, std::string note) noexcept
+	:
+	ChiliException( line,file ),
+	note( std::move( note ) )
+{}
+
+const char* ModelException::what() const noexcept
+{
+	std::ostringstream oss;
+	oss << ChiliException::what() << std::endl
+		<< "[Note] " << GetNote();
+	whatBuffer = oss.str();
+	return whatBuffer.c_str();
+}
+
+const char* ModelException::GetType() const noexcept
+{
+	return "Chili Graphics Exception";
+}
+
+std::string ModelException::GetNote() const noexcept
+{
+	return note;
 }
