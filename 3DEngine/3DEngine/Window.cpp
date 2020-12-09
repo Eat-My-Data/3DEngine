@@ -99,18 +99,20 @@ void Window::SetTitle( const std::string& title )
 	}
 }
 
-void Window::EnableCursor()
+void Window::EnableCursor() noexcept
 {
 	cursorEnabled = true;
 	ShowCursor();
 	EnableImGuiMouse();
+	FreeCursor();
 }
 
-void Window::DisableCursor()
+void Window::DisableCursor() noexcept
 {
 	cursorEnabled = false;
 	HideCursor();
 	DisableImGuiMouse();
+	ConfineCursor();
 }
 
 std::optional<int> Window::ProcessMessages() noexcept
@@ -144,22 +146,35 @@ Graphics& Window::Gfx()
 	return *pGfx;
 }
 
-void Window::HideCursor()
+void Window::ConfineCursor() noexcept
+{
+	RECT rect;
+	GetClientRect( hWnd,&rect );
+	MapWindowPoints( hWnd,nullptr,reinterpret_cast<POINT*>(&rect),2 );
+	ClipCursor( &rect );
+}
+
+void Window::FreeCursor() noexcept
+{
+	ClipCursor( nullptr );
+}
+
+void Window::HideCursor() noexcept
 {
 	while( ::ShowCursor( FALSE ) >= 0 );
 }
 
-void Window::ShowCursor()
+void Window::ShowCursor() noexcept
 {
 	while( ::ShowCursor( TRUE ) < 0 );
 }
 
-void Window::EnableImGuiMouse()
+void Window::EnableImGuiMouse() noexcept
 {
 	ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
 }
 
-void Window::DisableImGuiMouse()
+void Window::DisableImGuiMouse() noexcept
 {
 	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
 }
@@ -211,6 +226,21 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 	case WM_KILLFOCUS:
 		kbd.ClearState();
 		break;
+	case WM_ACTIVATE:
+		// confine/free cursor on window to foreground/background if cursor disabled
+		if ( !cursorEnabled )
+		{
+			if ( wParam & WA_ACTIVE )
+			{
+				ConfineCursor();
+				HideCursor();
+			}
+			else
+			{
+				FreeCursor();
+				ShowCursor();
+			}
+		}
 
 	/********** KEYBOARD MESSAGES **********/
 	case WM_KEYDOWN:
@@ -248,6 +278,7 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 	/********** MOUSE MESSAGES **********/
 	case WM_MOUSEMOVE:
 	{
+		const POINTS pt = MAKEPOINTS( lParam );
 		// cursorless exclusive gets first dibs
 		if( !cursorEnabled )
 		{
@@ -264,7 +295,6 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 		{
 			break;
 		}
-		const POINTS pt = MAKEPOINTS( lParam );
 		// in client region -> log move, and log enter + capture mouse ( if not previously stored )
 		if ( pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height )
 		{
@@ -292,6 +322,12 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 	}
 	case WM_LBUTTONDOWN:
 	{
+		SetForegroundWindow( hWnd );
+		if ( !cursorEnabled )
+		{	
+			ConfineCursor();
+			HideCursor();
+		}
 		// stifle this keyboard message if imgui wants to capture
 		if ( imio.WantCaptureKeyboard )
 		{
