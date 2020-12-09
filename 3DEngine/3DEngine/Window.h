@@ -54,9 +54,15 @@ public:
 	Window( const Window& ) = delete;
 	Window& operator=( const Window& ) = delete;
 	void SetTitle( const std::string& title );										// setter window title
+	void EnableCursor();
+	void DisableCursor();
 	static std::optional<int> ProcessMessages() noexcept;							// message pump
 	Graphics& Gfx();																// gives access to graphics pointer
 private:
+	void HideCursor();
+	void ShowCursor();
+	void EnableImGuiMouse();
+	void DisableImGuiMouse();
 	static LRESULT CALLBACK HandleMsgSetup( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;	// handles initial window creation
 	static LRESULT WINAPI HandleMsgThunk( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;	// forwards to HandleMsg
 	LRESULT HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;						// window message processor
@@ -64,6 +70,7 @@ public:
 	Keyboard kbd;																	// 	keyboard interface
 	Mouse mouse;																	// 	mouse interface
 private:
+	bool cursorEnabled = false;
 	int width;																		// 	window width
 	int height;																		// 	window height
 	HWND hWnd;																		// 	window object

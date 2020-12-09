@@ -99,6 +99,20 @@ void Window::SetTitle( const std::string& title )
 	}
 }
 
+void Window::EnableCursor()
+{
+	cursorEnabled = true;
+	ShowCursor();
+	EnableImGuiMouse();
+}
+
+void Window::DisableCursor()
+{
+	cursorEnabled = false;
+	HideCursor();
+	DisableImGuiMouse();
+}
+
 std::optional<int> Window::ProcessMessages() noexcept
 {
 	MSG msg;
@@ -128,6 +142,26 @@ Graphics& Window::Gfx()
 		throw CHWND_NOGFX_EXCEPT();
 	}
 	return *pGfx;
+}
+
+void Window::HideCursor()
+{
+	while( ::ShowCursor( FALSE ) >= 0 );
+}
+
+void Window::ShowCursor()
+{
+	while( ::ShowCursor( TRUE ) < 0 );
+}
+
+void Window::EnableImGuiMouse()
+{
+	ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+}
+
+void Window::DisableImGuiMouse()
+{
+	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
 }
 
 LRESULT Window::HandleMsgSetup( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept
@@ -214,6 +248,17 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 	/********** MOUSE MESSAGES **********/
 	case WM_MOUSEMOVE:
 	{
+		// cursorless exclusive gets first dibs
+		if( !cursorEnabled )
+		{
+			if( !mouse.IsInWindow() )
+			{
+				SetCapture( hWnd );
+				mouse.OnMouseEnter();
+				HideCursor();
+			}
+			break;
+		}
 		// stifle this keyboard message if imgui wants to capture
 		if ( imio.WantCaptureKeyboard )
 		{
