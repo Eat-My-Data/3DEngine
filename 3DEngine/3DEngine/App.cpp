@@ -16,7 +16,7 @@ App::App()
 	light( wnd.Gfx() )
 {
 	wnd.Gfx().SetProjection( dx::XMMatrixPerspectiveLH( 1.0f,9.0f / 16.0f,0.5f,40.0f ) );
-	wnd.DisableCursor();
+	wnd.EnableCursor();
 }
 
 void App::DoFrame()
@@ -33,9 +33,24 @@ void App::DoFrame()
 	cam.SpawnControlWindow();
 	light.SpawnControlWindow();
 	nano.ShowWindow( "Nanosuit" );
+	ShowRawInputWindow();
 
 	// present
 	wnd.Gfx().EndFrame();
+}
+
+void App::ShowRawInputWindow()
+{
+	while ( const auto d = wnd.mouse.ReadRawDelta() )
+	{
+		x += d->x;
+		y += d->y;
+	}
+	if ( ImGui::Begin( "Raw Input" ) )
+	{ 
+		ImGui::Text( "Tally: (%d,%d)",x,y );
+	}
+	ImGui::End();
 }
 
 App::~App()

@@ -15,7 +15,9 @@ public:
 	~App();
 private:
 	void DoFrame();										// master graphics frame
+	void ShowRawInputWindow();
 private:
+	int x = 0,y = 0;
 	ImguiManager imgui;									// external tool imgui
 	Window wnd;											// self contained win32 window, handles input from user
 	FrameTimer timer;									// world clock

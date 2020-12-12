@@ -77,4 +77,5 @@ private:
 	int height;																		// 	window height
 	HWND hWnd;																		// 	window object
 	std::unique_ptr<Graphics> pGfx;													// 	pointer to graphics object
+	std::vector<char> rawBuffer;													//	raw mouse input container
 };
