@@ -10,19 +10,20 @@
 class App
 {
 public:
-	App();												// handles window and light construction, sets projection matrix
-	int Go();											// master frame / message loop
+	App();														// handles window and light construction, sets projection matrix
+	int Go();													// master frame / message loop
 	~App();
 private:
-	void DoFrame();										// master graphics frame
-	void ShowRawInputWindow();
+	void DoFrame();												// master graphics frame
+	void ShowRawInputWindow();									// imgui window for mouse position
 private:
-	int x = 0,y = 0;
-	ImguiManager imgui;									// external tool imgui
-	Window wnd;											// self contained win32 window, handles input from user
-	FrameTimer timer;									// world clock
-	float speed_factor = 1.0f;							// time manipulation
-	Camera cam;											// configurable view matrix
-	PointLight light;									// configurable light source
+	bool cursorEnabled = true;									// used to manipulate cursor
+	int x = 0,y = 0;											// mouse x and y
+	ImguiManager imgui;											// external tool imgui
+	Window wnd;													// self contained win32 window, handles input from user
+	FrameTimer timer;											// world clock
+	float speed_factor = 1.0f;									// time manipulation
+	Camera cam;													// configurable view matrix
+	PointLight light;											// configurable light source
 	Model nano{ wnd.Gfx(),"Models\\nano_hierarchy.gltf" };		// external tool assimp for model loading
 };

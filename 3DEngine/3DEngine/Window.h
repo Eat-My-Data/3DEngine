@@ -54,17 +54,17 @@ public:
 	Window( const Window& ) = delete;
 	Window& operator=( const Window& ) = delete;
 	void SetTitle( const std::string& title );										// setter window title
-	void EnableCursor() noexcept;
-	void DisableCursor() noexcept;
+	void EnableCursor() noexcept;													// enables and shows cursor for window and imgui
+	void DisableCursor() noexcept;													// disables and hides cursor for window and imgui
 	static std::optional<int> ProcessMessages() noexcept;							// message pump
 	Graphics& Gfx();																// gives access to graphics pointer
 private:
-	void ConfineCursor() noexcept;
-	void FreeCursor() noexcept;
-	void HideCursor() noexcept;
-	void ShowCursor() noexcept;
-	void EnableImGuiMouse() noexcept;
-	void DisableImGuiMouse() noexcept;
+	void ConfineCursor() noexcept;													// clips cursor to window
+	void FreeCursor() noexcept;														// disables cursor clipping
+	void HideCursor() noexcept;														// hides cursor
+	void ShowCursor() noexcept;														// shows cursor
+	void EnableImGuiMouse() noexcept;												// allows mouse in imgui window
+	void DisableImGuiMouse() noexcept;												// disables mouse in imgui window
 	static LRESULT CALLBACK HandleMsgSetup( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;	// handles initial window creation
 	static LRESULT WINAPI HandleMsgThunk( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;	// forwards to HandleMsg
 	LRESULT HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;						// window message processor
@@ -72,10 +72,10 @@ public:
 	Keyboard kbd;																	// 	keyboard interface
 	Mouse mouse;																	// 	mouse interface
 private:
-	bool cursorEnabled = false;
+	bool cursorEnabled = true;
 	int width;																		// 	window width
 	int height;																		// 	window height
 	HWND hWnd;																		// 	window object
 	std::unique_ptr<Graphics> pGfx;													// 	pointer to graphics object
-	std::vector<char> rawBuffer;													//	raw mouse input container
+	std::vector<BYTE> rawBuffer;													//	raw mouse input container
 };

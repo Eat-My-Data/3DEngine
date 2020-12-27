@@ -395,43 +395,43 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 	}
 	/********** END MOUSE MESSAGES **********/
 
-	/********** RAW MOUSE MESSAGES **********/
+/************** RAW MOUSE MESSAGES **************/
 	case WM_INPUT:
 	{
 		UINT size;
 		// first get the size of the input data
-		if ( GetRawInputData(
+		if( GetRawInputData(
 			reinterpret_cast<HRAWINPUT>(lParam),
 			RID_INPUT,
 			nullptr,
 			&size,
-			sizeof( RAWINPUTHEADER ) ) == -1 )
+			sizeof( RAWINPUTHEADER ) ) == -1)
 		{
 			// bail msg processing if error
 			break;
 		}
-		rawBuffer.resize(size);
+		rawBuffer.resize( size );
 		// read in the input data
-		if ( GetRawInputData(
+		if( GetRawInputData(
 			reinterpret_cast<HRAWINPUT>(lParam),
 			RID_INPUT,
 			rawBuffer.data(),
 			&size,
-			sizeof( RAWINPUTHEADER ) ) == size )
+			sizeof( RAWINPUTHEADER ) ) != size )
 		{
 			// bail msg processing if error
 			break;
 		}
 		// process the raw input data
-		auto& ri = reinterpret_cast<const RAWINPUT&>( *rawBuffer.data() );
-		if ( ri.header.dwType == RIM_TYPEMOUSE &&
-			( ri.data.mouse.lLastX != 0 || ri.data.mouse.lLastY != 0 ) )
+		auto& ri = reinterpret_cast<const RAWINPUT&>(*rawBuffer.data());
+		if( ri.header.dwType == RIM_TYPEMOUSE &&
+			(ri.data.mouse.lLastX != 0 || ri.data.mouse.lLastY != 0) )
 		{
 			mouse.OnRawDelta( ri.data.mouse.lLastX,ri.data.mouse.lLastY );
 		}
 		break;
 	}
-	/********** END RAW MOUSE MESSAGES **********/
+	/************** END RAW MOUSE MESSAGES **************/
 	}
 	return DefWindowProc( hWnd,msg,wParam,lParam );
 }
