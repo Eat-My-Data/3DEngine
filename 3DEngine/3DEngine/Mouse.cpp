@@ -58,6 +58,16 @@ void Mouse::Flush()
     buffer = std::queue<Event>();
 }
 
+void Mouse::EnableRaw() noexcept
+{
+    rawEnabled = true;
+}
+
+void Mouse::DisableRaw() noexcept
+{
+    rawEnabled = false;
+}
+
 void Mouse::OnMouseMove( int newx,int newy ) noexcept
 {
     x = newx;

@@ -56,6 +56,7 @@ public:
 	void SetTitle( const std::string& title );										// setter window title
 	void EnableCursor() noexcept;													// enables and shows cursor for window and imgui
 	void DisableCursor() noexcept;													// disables and hides cursor for window and imgui
+	bool CursorEnabled() noexcept;													// returns cursorEnabled
 	static std::optional<int> ProcessMessages() noexcept;							// message pump
 	Graphics& Gfx();																// gives access to graphics pointer
 private:

@@ -15,7 +15,6 @@ public:
 	~App();
 private:
 	void DoFrame();												// master graphics frame
-	void ShowRawInputWindow();									// imgui window for mouse position
 private:
 	bool cursorEnabled = true;									// used to manipulate cursor
 	int x = 0,y = 0;											// mouse x and y
