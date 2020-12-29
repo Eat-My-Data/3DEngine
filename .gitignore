@@ -67,6 +67,7 @@ StyleCopReport.xml
 *.meta
 *.obj
 !3DEngine/3DEngine/Models/*.obj
+!3DEngine/3DEngine/Models/**/*.obj
 !3DEngine/3DEngine/assimp/*
 *.iobj
 *.pch
