@@ -4,6 +4,7 @@
 #include "ImguiManager.h"
 #include "Camera.h"
 #include "PointLight.h"
+#include "TestPlane.h"
 #include "Mesh.h"
 #include <set>
 
@@ -26,4 +27,5 @@ private:
 	PointLight light;											// configurable light source
 	Model nano{ wnd.Gfx(),"Models\\nano_textured\\nanosuit.obj" };		// external tool assimp for model loading
 	Model nano2{ wnd.Gfx(),"Models\\nano_textured\\nanosuit.obj" };		// external tool assimp for model loading
+	TestPlane plane;
 };
