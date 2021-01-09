@@ -25,4 +25,5 @@ private:
 	Camera cam;													// configurable view matrix
 	PointLight light;											// configurable light source
 	Model nano{ wnd.Gfx(),"Models\\nano_textured\\nanosuit.obj" };		// external tool assimp for model loading
+	Model nano2{ wnd.Gfx(),"Models\\nano_textured\\nanosuit.obj" };		// external tool assimp for model loading
 };

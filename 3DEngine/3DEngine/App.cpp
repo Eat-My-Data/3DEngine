@@ -17,9 +17,6 @@ App::App()
 	light( wnd.Gfx() )
 {
 	wnd.Gfx().SetProjection( dx::XMMatrixPerspectiveLH( 1.0f,9.0f / 16.0f,0.5f,40.0f ) );
-
-	auto b = Bind::Sampler::Resolve( wnd.Gfx() );
-	auto c = Bind::Sampler::Resolve( wnd.Gfx() );
 }
 
 void App::DoFrame()
@@ -30,6 +27,7 @@ void App::DoFrame()
 	light.Bind( wnd.Gfx(),cam.GetMatrix() );
 
 	nano.Draw( wnd.Gfx() );
+	nano2.Draw( wnd.Gfx() );
 	light.Draw( wnd.Gfx() );
 
 	while ( const auto e = wnd.kbd.ReadKey() )
@@ -94,6 +92,7 @@ void App::DoFrame()
 	cam.SpawnControlWindow();
 	light.SpawnControlWindow();
 	nano.ShowWindow( "Nanosuit" );
+	nano2.ShowWindow( "Nanosuit2" );
 
 	// present
 	wnd.Gfx().EndFrame();
