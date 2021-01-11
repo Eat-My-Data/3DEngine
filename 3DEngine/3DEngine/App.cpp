@@ -96,6 +96,7 @@ void App::DoFrame()
 	light.SpawnControlWindow();
 	nano.ShowWindow( "Nanosuit" );
 	nano2.ShowWindow( "Nanosuit2" );
+	plane.SpawnControlWindow( wnd.Gfx() );
 
 	// present
 	wnd.Gfx().EndFrame();
