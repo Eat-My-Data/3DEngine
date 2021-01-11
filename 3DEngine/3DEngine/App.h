@@ -25,7 +25,8 @@ private:
 	float speed_factor = 1.0f;									// time manipulation
 	Camera cam;													// configurable view matrix
 	PointLight light;											// configurable light source
-	Model nano{ wnd.Gfx(),"Models\\nano_textured\\nanosuit.obj" };		// external tool assimp for model loading
-	Model nano2{ wnd.Gfx(),"Models\\nano_textured\\nanosuit.obj" };		// external tool assimp for model loading
-	TestPlane plane;
+	Model wall{ wnd.Gfx(),"Models\\brick_wall\\brick_wall.obj" };
+	TestPlane tp{ wnd.Gfx(),1.0 };
+
+	// Model nano{ wnd.Gfx(),"Models\\nano_textured\\nanosuit.obj" };		// external tool assimp for model loading
 };

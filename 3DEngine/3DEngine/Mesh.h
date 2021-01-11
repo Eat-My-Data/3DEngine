@@ -14,7 +14,7 @@ public:
 	ModelException( int line,const char* file,std::string note ) noexcept;
 	const char* what() const noexcept override;
 	virtual const char* GetType() const noexcept;
-	std::string GetNote() const noexcept;
+	const std::string& GetNote() const noexcept;
 private:
 	std::string note;
 };
@@ -55,6 +55,7 @@ public:
 	Model( Graphics& gfx,const std::string fileName );
 	void Draw( Graphics& gfx ) const noxnd;
 	void ShowWindow( const char* windowName = nullptr ) noexcept;
+	void SetRootTransform( DirectX::FXMMATRIX tf ) noexcept;
 	~Model() noexcept;
 private:
 	static std::unique_ptr<Mesh> ParseMesh( Graphics& gfx,const aiMesh& mesh,const aiMaterial* const* pMaterial );
