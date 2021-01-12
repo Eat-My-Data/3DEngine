@@ -18,7 +18,6 @@ public:
 	virtual DirectX::XMMATRIX GetTransformXM() const noexcept = 0;		// virtual getter for transform matrix
 	void Draw( Graphics& gfx ) const noxnd;								// binds all attributes to model, and calls DrawIndexed
 	virtual ~Drawable() = default;										// esure destruction of derived class
-protected:
 	template<class T>
 	T* QueryBindable() noexcept											// find bindable of type T
 	{
@@ -31,6 +30,7 @@ protected:
 		}
 		return nullptr;
 	}
+protected:
 	void AddBind( std::shared_ptr<Bind::Bindable> bind ) noxnd;				// add drawable specific bind
 private:
 	const Bind::IndexBuffer* pIndexBuffer = nullptr;						// pointer to index buffer
