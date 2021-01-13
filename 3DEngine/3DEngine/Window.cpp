@@ -141,7 +141,7 @@ std::optional<int> Window::ProcessMessages() noexcept
 		if ( msg.message == WM_QUIT )
 		{
 			// return optional wrapping int ( arg to PostQuitMessage is in wparam )
-			return msg.wParam;
+			return (int)msg.wParam;
 		}
 
 		// TranslateMessage will post auxillary WM_CHAR messages from key msgs

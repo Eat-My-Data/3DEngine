@@ -43,6 +43,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{b06480a4-665b-4d75-820d-0cd1c65e593a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\Common">
+      <UniqueIdentifier>{04cab0b4-d6b9-49c9-9bc4-ef062b61e397}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -325,6 +328,12 @@
     </ClInclude>
     <ClInclude Include="TestCube.h">
       <Filter>Header Files\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderOps.hlsl">
+      <Filter>Shader\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.hlsl">
+      <Filter>Shader\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

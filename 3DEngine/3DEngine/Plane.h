@@ -54,9 +54,9 @@ public:
 			{
 				return (unsigned short)(y * nVertices_x + x);
 			};
-			for( size_t y = 0; y < divisions_y; y++ )
+			for( size_t y = 0; y < size_t(divisions_y); y++ )
 			{
-				for( size_t x = 0; x < divisions_x; x++ )
+				for( size_t x = 0; x < size_t(divisions_x); x++ )
 				{
 					const std::array<unsigned short,4> indexArray =
 					{ vxy2i( x,y ),vxy2i( x + 1,y ),vxy2i( x,y + 1 ),vxy2i( x + 1,y + 1 ) };

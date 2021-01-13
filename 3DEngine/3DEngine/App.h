@@ -11,7 +11,7 @@
 class App
 {
 public:
-	App();														// handles window and light construction, sets projection matrix
+	App();														
 	int Go();													// master frame / message loop
 	~App();
 private:
