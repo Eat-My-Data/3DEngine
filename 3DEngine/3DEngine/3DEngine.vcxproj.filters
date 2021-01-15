@@ -335,6 +335,15 @@
     <ClInclude Include="PointLight.hlsl">
       <Filter>Shader\Common</Filter>
     </ClInclude>
+    <ClInclude Include="LightVectorData.hlsl">
+      <Filter>Shader\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.hlsl">
+      <Filter>Shader\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="NormalMapTwerker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="3DEngine.rc">
@@ -392,6 +401,9 @@
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="PhongVSNotex.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="PhongPSSpec.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>

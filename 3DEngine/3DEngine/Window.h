@@ -79,4 +79,5 @@ private:
 	HWND hWnd;																		// 	window object
 	std::unique_ptr<Graphics> pGfx;													// 	pointer to graphics object
 	std::vector<BYTE> rawBuffer;													//	raw mouse input container
+	std::string commandLine;
 };
