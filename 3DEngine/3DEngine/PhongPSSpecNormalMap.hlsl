@@ -1,5 +1,6 @@
 #include "ShaderOps.hlsl"
 #include "LightVectorData.hlsl"
+
 #include "PointLight.hlsl"
 
 cbuffer ObjectCBuf
@@ -23,7 +24,7 @@ float4 main(float3 viewFragPos : Position, float3 viewNormal : Normal, float3 vi
 {
     // normalize the mesh normal
     viewNormal = normalize(viewNormal);
-    // sample normal with maped if normal mapping enabled
+    // replace normal with mapped if normal mapping enabled
     if (normalMapEnabled)
     {
         viewNormal = MapNormal(normalize(viewTan), normalize(viewBitan), viewNormal, tc, nmap, splr);
@@ -33,11 +34,11 @@ float4 main(float3 viewFragPos : Position, float3 viewNormal : Normal, float3 vi
     // specular parameter determination (mapped or uniform)
     float3 specularReflectionColor;
     float specularPower = specularPowerConst;
-    if( specularMapEnabled )
+    if (specularMapEnabled)
     {
         const float4 specularSample = spec.Sample(splr, tc);
         specularReflectionColor = specularSample.rgb * specularMapWeight;
-        if( hasGloss )
+        if (hasGloss)
         {
             specularPower = pow(2.0f, specularSample.a * 13.0f);
         }
@@ -46,10 +47,10 @@ float4 main(float3 viewFragPos : Position, float3 viewNormal : Normal, float3 vi
     {
         specularReflectionColor = specularColor;
     }
-    // attenuation
+	// attenuation
     const float att = Attenuate(attConst, attLin, attQuad, lv.distToL);
 	// diffuse light
-    const float3 diffuse = Diffuse(diffuseColor, diffuseIntensity, att, lv.distToL, viewNormal);
+    const float3 diffuse = Diffuse(diffuseColor, diffuseIntensity, att, lv.dirToL, viewNormal);
     // specular reflected
     const float3 specularReflected = Speculate(
         specularReflectionColor, 1.0f, viewNormal,
