@@ -344,10 +344,10 @@
     <ClInclude Include="Transform.hlsl">
       <Filter>Shader\Common</Filter>
     </ClInclude>
-    <ClInclude Include="NormalMapTwerker.h">
+    <ClInclude Include="ChiliXM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ChiliXM.h">
+    <ClInclude Include="NormalMapTwerker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
