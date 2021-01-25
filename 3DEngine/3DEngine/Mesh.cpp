@@ -603,6 +603,10 @@ std::unique_ptr<Mesh> Model::ParseMesh( Graphics& gfx,const aiMesh& mesh,const a
 		throw std::runtime_error("terrible combination of textures in material smh");
 	}
 
+	// anything with alpha diffuse is 2-sided IN SPONZA, need a better way
+	// of signalling 2-sidedness to be more general in the future
+	bindablePtrs.push_back( Rasterizer::Resolve( gfx,hasAlphaDiffuse ) );
+
 	return std::make_unique<Mesh>( gfx,std::move( bindablePtrs ) );
 }
 
