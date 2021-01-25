@@ -27,6 +27,8 @@ private:
 	Camera cam;													// configurable view matrix
 	PointLight light;											// configurable light source
 	Model sponza{ wnd.Gfx(),"Models\\sponza\\sponza.obj",1.0f / 20.0f };
+	TestPlane bluePlane{ wnd.Gfx(),6.0f,{ 0.3f,0.3f,1.0f,0.0f } };
+	TestPlane redPlane{ wnd.Gfx(),6.0f,{ 1.0f,0.3f,0.3f,0.0f } };
 	//Model gobber{ wnd.Gfx(),"Models\\gobber\\GoblinX.obj",6.0f };
 	//Model wall{ wnd.Gfx(),"Models\\brick_wall\\brick_wall.obj",6.0f };
 	//TestPlane tp{ wnd.Gfx(),6.0 };
