@@ -3,15 +3,14 @@
 #include <algorithm>
 #include "ChiliMath.h"
 #include "Surface.h"
-#include "GDIPlusManager.h"
 #include "imgui/imgui.h"
 #include "VertexBuffer.h"
 #include "TexturePreprocessor.h"
 #include <shellapi.h>
+#include <dxtex/DirectXTex.h>
 
 namespace dx = DirectX;
 
-GDIPlusManager gdipm;
 
 App::App( const std::string& commandLine )
 	:
