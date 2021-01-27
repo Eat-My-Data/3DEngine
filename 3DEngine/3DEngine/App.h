@@ -6,6 +6,7 @@
 #include "PointLight.h"
 #include "TestPlane.h"
 #include "Mesh.h"
+#include "ScriptCommander.h"
 #include <set>
 
 class App
@@ -22,6 +23,7 @@ private:
 	int x = 0,y = 0;											// mouse x and y
 	ImguiManager imgui;											// external tool imgui
 	Window wnd;													// self contained win32 window, handles input from user
+	ScriptCommander scriptCommander;
 	FrameTimer timer;											// world clock
 	float speed_factor = 1.0f;									// time manipulation
 	Camera cam;													// configurable view matrix
