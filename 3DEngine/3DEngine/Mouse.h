@@ -1,3 +1,23 @@
+/****************************************************************************************** 
+ *	Chili DirectX Framework Version 16.07.20											  *	
+ *	Mouse.h																				  *
+ *	Copyright 2016 PlanetChili <http://www.planetchili.net>								  *
+ *																						  *
+ *	This file is part of The Chili DirectX Framework.									  *
+ *																						  *
+ *	The Chili DirectX Framework is free software: you can redistribute it and/or modify	  *
+ *	it under the terms of the GNU General Public License as published by				  *
+ *	the Free Software Foundation, either version 3 of the License, or					  *
+ *	(at your option) any later version.													  *
+ *																						  *
+ *	The Chili DirectX Framework is distributed in the hope that it will be useful,		  *
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of						  *
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the						  *
+ *	GNU General Public License for more details.										  *
+ *																						  *
+ *	You should have received a copy of the GNU General Public License					  *
+ *	along with The Chili DirectX Framework.  If not, see <http://www.gnu.org/licenses/>.  *
+ ******************************************************************************************/
 #pragma once
 #include <queue>
 #include <optional>
@@ -23,7 +43,7 @@ public:
 			WheelDown,
 			Move,
 			Enter,
-			Leave
+			Leave,
 		};
 	private:
 		Type type;
@@ -46,7 +66,7 @@ public:
 		}
 		std::pair<int,int> GetPos() const noexcept
 		{
-			return {x,y};
+			return{ x,y };
 		}
 		int GetPosX() const noexcept
 		{
@@ -81,9 +101,10 @@ public:
 	{
 		return buffer.empty();
 	}
-	void Flush();
+	void Flush() noexcept;
 	void EnableRaw() noexcept;
 	void DisableRaw() noexcept;
+	bool RawEnabled() const noexcept;
 private:
 	void OnMouseMove( int x,int y ) noexcept;
 	void OnMouseLeave() noexcept;

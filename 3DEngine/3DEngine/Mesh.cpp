@@ -5,6 +5,9 @@
 #include <sstream>
 #include <filesystem>
 #include "ChiliXM.h"
+#include "DynamicConstant.h"
+#include "ConstantBuffersEx.h"
+#include "LayoutCodex.h"
 
 namespace dx = DirectX;
 
@@ -45,13 +48,11 @@ Mesh::Mesh( Graphics& gfx,std::vector<std::shared_ptr<Bind::Bindable>> bindPtrs 
 
 	AddBind( std::make_shared<Bind::TransformCbuf>( gfx,*this ) );
 }
-
 void Mesh::Draw( Graphics& gfx,DirectX::FXMMATRIX accumulatedTransform ) const noxnd
 {
 	DirectX::XMStoreFloat4x4( &transform,accumulatedTransform );
 	Drawable::Draw( gfx );
 }
-
 DirectX::XMMATRIX Mesh::GetTransformXM() const noexcept
 {
 	return DirectX::XMLoadFloat4x4( &transform );
@@ -119,6 +120,23 @@ void Node::ShowTree( Node*& pSelectedNode ) const noexcept
 	}
 }
 
+const Dcb::Buffer* Node::GetMaterialConstants() const noxnd
+{
+	if( meshPtrs.size() == 0 )
+	{
+		return nullptr;
+	}
+	auto pBindable = meshPtrs.front()->QueryBindable<Bind::CachingPixelConstantBufferEX>();
+	return &pBindable->GetBuffer();
+}
+
+void Node::SetMaterialConstants( const Dcb::Buffer& buf_in ) noxnd
+{
+	auto pcb = meshPtrs.front()->QueryBindable<Bind::CachingPixelConstantBufferEX>();
+	assert( pcb != nullptr );
+	pcb->SetBuffer( buf_in );
+}
+
 void Node::SetAppliedTransform( DirectX::FXMMATRIX transform ) noexcept
 {
 	dx::XMStoreFloat4x4( &appliedTransform,transform );
@@ -167,37 +185,120 @@ public:
 					tp.x = translation.x;
 					tp.y = translation.y;
 					tp.z = translation.z;
-					std::tie( i,std::ignore ) = transforms.insert( { id,tp } );
+					auto pMatConst = pSelectedNode->GetMaterialConstants();
+					auto buf = pMatConst != nullptr ? std::optional<Dcb::Buffer>{ *pMatConst } : std::optional<Dcb::Buffer>{};
+					std::tie( i,std::ignore ) = transforms.insert( { id,{ tp,false,std::move( buf ),false } } );
 				}
-				auto& transform = i->second;
-				ImGui::Text( "Orientation" );
-				ImGui::SliderAngle( "Roll",&transform.roll,-180.0f,180.0f );
-				ImGui::SliderAngle( "Pitch",&transform.pitch,-180.0f,180.0f );
-				ImGui::SliderAngle( "Yaw",&transform.yaw,-180.0f,180.0f );
-				ImGui::Text( "Position" );
-				ImGui::SliderFloat( "X",&transform.x,-20.0f,20.0f );
-				ImGui::SliderFloat( "Y",&transform.y,-20.0f,20.0f );
-				ImGui::SliderFloat( "Z",&transform.z,-20.0f,20.0f );
-				
-				if( !pSelectedNode->ControlMeDaddy( gfx,skinMaterial ) )
+				// link imgui ctrl to our cached transform params
 				{
-					pSelectedNode->ControlMeDaddy( gfx,ringMaterial );
+					auto& transform = i->second.tranformParams;
+					// dirty check
+					auto& dirty = i->second.transformParamsDirty;
+					const auto dcheck = [&dirty]( bool changed ) {dirty = dirty || changed; };
+					// widgets
+					ImGui::Text( "Orientation" );
+					dcheck( ImGui::SliderAngle( "Roll",&transform.roll,-180.0f,180.0f ) );
+					dcheck( ImGui::SliderAngle( "Pitch",&transform.pitch,-180.0f,180.0f ) );
+					dcheck( ImGui::SliderAngle( "Yaw",&transform.yaw,-180.0f,180.0f ) );
+					ImGui::Text( "Position" );
+					dcheck( ImGui::SliderFloat( "X",&transform.x,-20.0f,20.0f ) );
+					dcheck( ImGui::SliderFloat( "Y",&transform.y,-20.0f,20.0f ) );
+					dcheck( ImGui::SliderFloat( "Z",&transform.z,-20.0f,20.0f ) );
+				}
+				// link imgui ctrl to our cached material params
+				if( i->second.materialCbuf )
+				{
+					auto& mat = *i->second.materialCbuf;
+					// dirty check
+					auto& dirty = i->second.materialCbufDirty;
+					const auto dcheck = [&dirty]( bool changed ) {dirty = dirty || changed; };
+					// widgets
+					ImGui::Text( "Material" );
+					if( auto v = mat["normalMapEnabled"]; v.Exists() )
+					{
+						dcheck( ImGui::Checkbox( "Norm Map",&v ) );
+					}
+					if( auto v = mat["specularMapEnabled"]; v.Exists() )
+					{
+						dcheck( ImGui::Checkbox( "Spec Map",&v ) );
+					}
+					if( auto v = mat["hasGlossMap"]; v.Exists() )
+					{
+						dcheck( ImGui::Checkbox( "Gloss Map",&v ) );
+					}
+					if( auto v = mat["materialColor"]; v.Exists() )
+					{
+						dcheck( ImGui::ColorPicker3( "Diff Color",reinterpret_cast<float*>(&static_cast<dx::XMFLOAT3&>(v)) ) );
+					}
+					if( auto v = mat["specularPower"]; v.Exists() )
+					{
+						dcheck( ImGui::SliderFloat( "Spec Power",&v,0.0f,100.0f,"%.1f",1.5f ) );
+					}
+					if( auto v = mat["specularColor"]; v.Exists() )
+					{
+						dcheck( ImGui::ColorPicker3( "Spec Color",reinterpret_cast<float*>(&static_cast<dx::XMFLOAT3&>(v)) ) );
+					}
+					if( auto v = mat["specularMapWeight"]; v.Exists() )
+					{
+						dcheck( ImGui::SliderFloat( "Spec Weight",&v,0.0f,4.0f ) );
+					}
+					if( auto v = mat["specularIntensity"]; v.Exists() )
+					{
+						dcheck( ImGui::SliderFloat( "Spec Intens",&v,0.0f,1.0f ) );
+					}
 				}
 			}
 		}
 		ImGui::End();
 	}
-	dx::XMMATRIX GetTransform() const noexcept
+	void ApplyParameters() noxnd
+	{
+		if( TransformDirty() )
+		{
+			pSelectedNode->SetAppliedTransform( GetTransform() );
+			ResetTransformDirty();
+		}
+		if( MaterialDirty() )
+		{
+			pSelectedNode->SetMaterialConstants( GetMaterial() );
+			ResetMaterialDirty();
+		}
+	}
+private:
+	dx::XMMATRIX GetTransform() const noxnd
 	{
 		assert( pSelectedNode != nullptr );
-		const auto& transform = transforms.at( pSelectedNode->GetId() );
+		const auto& transform = transforms.at( pSelectedNode->GetId() ).tranformParams;
 		return 
 			dx::XMMatrixRotationRollPitchYaw( transform.roll,transform.pitch,transform.yaw ) *
 			dx::XMMatrixTranslation( transform.x,transform.y,transform.z );
 	}
-	Node* GetSelectedNode() const noexcept
+	const Dcb::Buffer& GetMaterial() const noxnd
 	{
-		return pSelectedNode;
+		assert( pSelectedNode != nullptr );
+		const auto& mat = transforms.at( pSelectedNode->GetId() ).materialCbuf;
+		assert( mat );
+		return *mat;
+	}
+	bool TransformDirty() const noxnd
+	{
+		return pSelectedNode && transforms.at( pSelectedNode->GetId() ).transformParamsDirty;
+	}
+	void ResetTransformDirty() noxnd
+	{
+		transforms.at( pSelectedNode->GetId() ).transformParamsDirty = false;
+	}
+	bool MaterialDirty() const noxnd
+	{
+		return pSelectedNode && transforms.at( pSelectedNode->GetId() ).materialCbufDirty;
+	}
+	void ResetMaterialDirty() noxnd
+	{
+		transforms.at( pSelectedNode->GetId() ).materialCbufDirty = false;
+	}
+	bool IsDirty() const noxnd
+	{
+		return TransformDirty() || MaterialDirty();
 	}
 private:
 	Node* pSelectedNode;
@@ -210,12 +311,17 @@ private:
 		float y = 0.0f;
 		float z = 0.0f;
 	};
-	Node::PSMaterialConstantFullmonte skinMaterial;
-	Node::PSMaterialConstantNotex ringMaterial;
-	std::unordered_map<int,TransformParameters> transforms;
+	struct NodeData
+	{
+		TransformParameters tranformParams;
+		bool transformParamsDirty;
+		std::optional<Dcb::Buffer> materialCbuf;
+		bool materialCbufDirty;
+	};
+	std::unordered_map<int,NodeData> transforms;
 };
 
-Model::Model( Graphics& gfx,const std::string& pathString,float scale )
+Model::Model( Graphics& gfx,const std::string& pathString,const float scale )
 	:
 	pWindow( std::make_unique<ModelWindow>() )
 {
@@ -244,14 +350,14 @@ Model::Model( Graphics& gfx,const std::string& pathString,float scale )
 
 void Model::Draw( Graphics& gfx ) const noxnd
 {
-	if( auto node = pWindow->GetSelectedNode() )
-	{
-		node->SetAppliedTransform( pWindow->GetTransform() );
-	}
+	// I'm still not happy about updating parameters (i.e. mutating a bindable GPU state
+	// which is part of a mesh which is part of a node which is part of the model that is
+	// const in this call) Can probably do this elsewhere
+	pWindow->ApplyParameters();
 	pRoot->Draw( gfx,dx::XMMatrixIdentity() );
 }
 
-void Model::ShowWindow(  Graphics& gfx,const char* windowName ) noexcept
+void Model::ShowWindow( Graphics& gfx,const char* windowName ) noexcept
 {
 	pWindow->Show( gfx,windowName,*pRoot );
 }
@@ -281,8 +387,7 @@ std::unique_ptr<Mesh> Model::ParseMesh( Graphics& gfx,const aiMesh& mesh,const a
 	bool hasDiffuseMap = false;
 	float shininess = 2.0f;
 	dx::XMFLOAT4 specularColor = { 0.18f,0.18f,0.18f,1.0f };
-	dx::XMFLOAT4 diffuseColor = { 0.45f,0.45f,0.45f,1.0f };
-
+	dx::XMFLOAT4 diffuseColor = { 0.45f,0.45f,0.85f,1.0f };
 	if( mesh.mMaterialIndex >= 0 )
 	{
 		auto& material = *pMaterials[mesh.mMaterialIndex];
@@ -312,7 +417,6 @@ std::unique_ptr<Mesh> Model::ParseMesh( Graphics& gfx,const aiMesh& mesh,const a
 		{
 			material.Get( AI_MATKEY_COLOR_SPECULAR,reinterpret_cast<aiColor3D&>(specularColor) );
 		}
-
 		if( !hasAlphaGloss )
 		{
 			material.Get( AI_MATKEY_SHININESS,shininess );
@@ -332,7 +436,7 @@ std::unique_ptr<Mesh> Model::ParseMesh( Graphics& gfx,const aiMesh& mesh,const a
 		}
 	}
 
-	const auto meshTag = rootPath + "%" + mesh.mName.C_Str();
+	const auto meshTag = path.string() + "%" + mesh.mName.C_Str();
 
 	if( hasDiffuseMap && hasNormalMap && hasSpecularMap )
 	{
@@ -380,13 +484,24 @@ std::unique_ptr<Mesh> Model::ParseMesh( Graphics& gfx,const aiMesh& mesh,const a
 		) );
 
 		bindablePtrs.push_back( InputLayout::Resolve( gfx,vbuf.GetLayout(),pvsbc ) );
-		
-		Node::PSMaterialConstantFullmonte pmc;
-		pmc.specularPower = shininess;
-		pmc.hasGlossMap = hasAlphaGloss ? TRUE : FALSE;
-		// this is CLEARLY an issue... all meshes will share same mat const, but may have different
-		// Ns (specular power) specified for each in the material properties... bad conflict
-		bindablePtrs.push_back( PixelConstantBuffer<Node::PSMaterialConstantFullmonte>::Resolve( gfx,pmc,1u ) );
+
+		Dcb::RawLayout lay;
+		lay.Add<Dcb::Bool>( "normalMapEnabled" );
+		lay.Add<Dcb::Bool>( "specularMapEnabled" );
+		lay.Add<Dcb::Bool>( "hasGlossMap" );
+		lay.Add<Dcb::Float>( "specularPower" );
+		lay.Add<Dcb::Float3>( "specularColor" );
+		lay.Add<Dcb::Float>( "specularMapWeight" );
+
+		auto buf = Dcb::Buffer( std::move( lay ) );
+		buf["normalMapEnabled"] = true;
+		buf["specularMapEnabled"] = true;
+		buf["hasGlossMap"] = hasAlphaGloss;
+		buf["specularPower"] = shininess;
+		buf["specularColor"] = dx::XMFLOAT3{ 0.75f,0.75f,0.75f };
+		buf["specularMapWeight"] = 0.671f;
+
+		bindablePtrs.push_back( std::make_shared<CachingPixelConstantBufferEX>( gfx,buf,1u ) );
 	}
 	else if( hasDiffuseMap && hasNormalMap )
 	{
@@ -433,17 +548,17 @@ std::unique_ptr<Mesh> Model::ParseMesh( Graphics& gfx,const aiMesh& mesh,const a
 
 		bindablePtrs.push_back( InputLayout::Resolve( gfx,vbuf.GetLayout(),pvsbc ) );
 
-		struct PSMaterialConstantDiffnorm
-		{
-			float specularIntensity = 0.18f;
-			float specularPower;
-			BOOL  normalMapEnabled = TRUE;
-			float padding[1];
-		} pmc;
-		pmc.specularPower = shininess;
-		// this is CLEARLY an issue... all meshes will share same mat const, but may have different
-		// Ns (specular power) specified for each in the material properties... bad conflict
-		bindablePtrs.push_back( PixelConstantBuffer<PSMaterialConstantDiffnorm>::Resolve( gfx,pmc,1u ) );
+		Dcb::RawLayout layout;
+		layout.Add<Dcb::Float>( "specularIntensity" );
+		layout.Add<Dcb::Float>( "specularPower" );
+		layout.Add<Dcb::Bool>( "normalMapEnabled" );
+
+		auto cbuf = Dcb::Buffer( std::move( layout ) );
+		cbuf["specularIntensity"] = (specularColor.x + specularColor.y + specularColor.z) / 3.0f;
+		cbuf["specularPower"] = shininess;
+		cbuf["normalMapEnabled"] = true;
+
+		bindablePtrs.push_back( std::make_shared<CachingPixelConstantBufferEX>( gfx,cbuf,1u ) );
 	}
 	else if( hasDiffuseMap && !hasNormalMap && hasSpecularMap )
 	{
@@ -486,19 +601,17 @@ std::unique_ptr<Mesh> Model::ParseMesh( Graphics& gfx,const aiMesh& mesh,const a
 
 		bindablePtrs.push_back( InputLayout::Resolve( gfx,vbuf.GetLayout(),pvsbc ) );
 
-		struct PSMaterialConstantDiffuseSpec
-		{
-			float specularPowerConst;
-			BOOL hasGloss;
-			float specularMapWeight;
-			float padding;
-		} pmc;
-		pmc.specularPowerConst = shininess;
-		pmc.hasGloss = hasAlphaGloss ? TRUE : FALSE;
-		pmc.specularMapWeight = 1.0f;
-		// this is CLEARLY an issue... all meshes will share same mat const, but may have different
-		// Ns (specular power) specified for each in the material properties... bad conflict
-		bindablePtrs.push_back( PixelConstantBuffer<PSMaterialConstantDiffuseSpec>::Resolve( gfx,pmc,1u ) );
+		Dcb::RawLayout lay;
+		lay.Add<Dcb::Float>( "specularPower" );
+		lay.Add<Dcb::Bool>( "hasGloss" );
+		lay.Add<Dcb::Float>( "specularMapWeight" );
+
+		auto buf = Dcb::Buffer( std::move( lay ) );
+		buf["specularPower"] = shininess;
+		buf["hasGloss"] = hasAlphaGloss;
+		buf["specularMapWeight"] = 1.0f;
+
+		bindablePtrs.push_back( std::make_unique<Bind::CachingPixelConstantBufferEX>( gfx,buf,1u ) );
 	}
 	else if( hasDiffuseMap )
 	{
@@ -541,17 +654,16 @@ std::unique_ptr<Mesh> Model::ParseMesh( Graphics& gfx,const aiMesh& mesh,const a
 
 		bindablePtrs.push_back( InputLayout::Resolve( gfx,vbuf.GetLayout(),pvsbc ) );
 
-		struct PSMaterialConstantDiffuse
-		{
-			float specularIntensity;
-			float specularPower;
-			float padding[2];
-		} pmc;
-		pmc.specularPower = shininess;
-		pmc.specularIntensity = (specularColor.x + specularColor.y + specularColor.z) / 3.0f;
-		// this is CLEARLY an issue... all meshes will share same mat const, but may have different
-		// Ns (specular power) specified for each in the material properties... bad conflict
-		bindablePtrs.push_back( PixelConstantBuffer<PSMaterialConstantDiffuse>::Resolve( gfx,pmc,1u ) );
+		Dcb::RawLayout lay;
+		lay.Add<Dcb::Float>( "specularIntensity" );
+		lay.Add<Dcb::Float>( "specularPower" );
+
+		auto buf = Dcb::Buffer( std::move( lay ) );
+		buf["specularIntensity"] = (specularColor.x + specularColor.y + specularColor.z) / 3.0f;
+		buf["specularPower"] = shininess;
+		buf["specularMapWeight"] = 1.0f;
+
+		bindablePtrs.push_back( std::make_unique<Bind::CachingPixelConstantBufferEX>( gfx,buf,1u ) );
 	}
 	else if( !hasDiffuseMap && !hasNormalMap && !hasSpecularMap )
 	{
@@ -591,18 +703,22 @@ std::unique_ptr<Mesh> Model::ParseMesh( Graphics& gfx,const aiMesh& mesh,const a
 		bindablePtrs.push_back( PixelShader::Resolve( gfx,"PhongPSNotex.cso" ) );
 
 		bindablePtrs.push_back( InputLayout::Resolve( gfx,vbuf.GetLayout(),pvsbc ) );
+			   
+		Dcb::RawLayout lay;
+		lay.Add<Dcb::Float4>( "materialColor" );
+		lay.Add<Dcb::Float4>( "specularColor" );
+		lay.Add<Dcb::Float>( "specularPower" );
 
-		Node::PSMaterialConstantNotex pmc;
-		pmc.specularPower = shininess;
-		pmc.specularColor = specularColor;
-		pmc.materialColor = diffuseColor;
-		// this is CLEARLY an issue... all meshes will share same mat const, but may have different
-		// Ns (specular power) specified for each in the material properties... bad conflict
-		bindablePtrs.push_back( PixelConstantBuffer<Node::PSMaterialConstantNotex>::Resolve( gfx,pmc,1u ) );
+		auto buf = Dcb::Buffer( std::move( lay ) );
+		buf["specularPower"] = shininess;
+		buf["specularColor"] = specularColor;
+		buf["materialColor"] = diffuseColor;
+
+		bindablePtrs.push_back( std::make_unique<Bind::CachingPixelConstantBufferEX>( gfx,buf,1u ) );
 	}
 	else
 	{
-		throw std::runtime_error("terrible combination of textures in material smh");
+		throw std::runtime_error( "terrible combination of textures in material smh" );
 	}
 
 	// anything with alpha diffuse is 2-sided IN SPONZA, need a better way
