@@ -5,14 +5,15 @@
 #include "Camera.h"
 #include "PointLight.h"
 #include "TestPlane.h"
+#include "TestCube.h"
 #include "Mesh.h"
 #include "ScriptCommander.h"
-#include <set>
+#include "Stencil.h"
 
 class App
 {
 public:
-	App( const std::string& commandLine = "" );														
+	App( const std::string& commandLine = "" );					// initialize commandLine, window, scriptCommander, and setinitial positions/projection
 	int Go();													// master frame / message loop
 	~App();
 private:
@@ -28,11 +29,13 @@ private:
 	float speed_factor = 1.0f;									// time manipulation
 	Camera cam;													// configurable view matrix
 	PointLight light;											// configurable light source
-	Model sponza{ wnd.Gfx(),"Models\\sponza\\sponza.obj",1.0f / 20.0f };
-	TestPlane bluePlane{ wnd.Gfx(),6.0f,{ 0.3f,0.3f,1.0f,0.0f } };
-	TestPlane redPlane{ wnd.Gfx(),6.0f,{ 1.0f,0.3f,0.3f,0.0f } };
-	//Model gobber{ wnd.Gfx(),"Models\\gobber\\GoblinX.obj",6.0f };
-	//Model wall{ wnd.Gfx(),"Models\\brick_wall\\brick_wall.obj",6.0f };
-	//TestPlane tp{ wnd.Gfx(),6.0 };
-	//Model nano{ wnd.Gfx(),"Models\\nano_textured\\nanosuit.obj",2.0f };
+	TestCube cube{ wnd.Gfx(),4.0f };
+	TestCube cube2{ wnd.Gfx(),4.0f };
+	// Model sponza{ wnd.Gfx(),"Models\\sponza\\sponza.obj",1.0f / 20.0f };
+	// TestPlane bluePlane{ wnd.Gfx(),6.0f,{ 0.3f,0.3f,1.0f,0.0f } };
+	// TestPlane redPlane{ wnd.Gfx(),6.0f,{ 1.0f,0.3f,0.3f,0.0f } };
+	// Model gobber{ wnd.Gfx(),"Models\\gobber\\GoblinX.obj",6.0f };
+	// Model wall{ wnd.Gfx(),"Models\\brick_wall\\brick_wall.obj",6.0f };
+	// TestPlane tp{ wnd.Gfx(),6.0 };
+	// Model nano{ wnd.Gfx(),"Models\\nano_textured\\nanosuit.obj",2.0f };
 };

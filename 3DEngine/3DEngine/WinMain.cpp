@@ -8,7 +8,7 @@ int CALLBACK WinMain(
 {
 	try
 	{
-		return App{ lpCmdLine }.Go();				// start application
+		return App{ lpCmdLine }.Go();	// start application
 	}
 	catch ( const ChiliException& e )	// catch custom exceptions
 	{

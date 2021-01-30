@@ -48,11 +48,13 @@ Mesh::Mesh( Graphics& gfx,std::vector<std::shared_ptr<Bind::Bindable>> bindPtrs 
 
 	AddBind( std::make_shared<Bind::TransformCbuf>( gfx,*this ) );
 }
+
 void Mesh::Draw( Graphics& gfx,DirectX::FXMMATRIX accumulatedTransform ) const noxnd
 {
 	DirectX::XMStoreFloat4x4( &transform,accumulatedTransform );
 	Drawable::Draw( gfx );
 }
+
 DirectX::XMMATRIX Mesh::GetTransformXM() const noexcept
 {
 	return DirectX::XMLoadFloat4x4( &transform );
@@ -417,6 +419,7 @@ std::unique_ptr<Mesh> Model::ParseMesh( Graphics& gfx,const aiMesh& mesh,const a
 		{
 			material.Get( AI_MATKEY_COLOR_SPECULAR,reinterpret_cast<aiColor3D&>(specularColor) );
 		}
+
 		if( !hasAlphaGloss )
 		{
 			material.Get( AI_MATKEY_SHININESS,shininess );
