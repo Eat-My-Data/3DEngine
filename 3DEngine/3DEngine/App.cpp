@@ -39,11 +39,11 @@ void App::DoFrame()
 	//nano.Draw( wnd.Gfx() );
 	//gobber.Draw( wnd.Gfx() );
 	light.Draw( wnd.Gfx() );
+	sponza.Draw( wnd.Gfx() );
 	cube.Draw( wnd.Gfx() );
 	cube2.Draw( wnd.Gfx() );
 	cube.DrawOutline( wnd.Gfx() );
 	cube2.DrawOutline( wnd.Gfx() );
-	// sponza.Draw( wnd.Gfx() );
 	// bluePlane.Draw( wnd.Gfx() );
 	// redPlane.Draw( wnd.Gfx() );
 
@@ -116,7 +116,7 @@ void App::DoFrame()
 	// wall.ShowWindow( wnd.Gfx(),"Wall" );
 	// tp.SpawnControlWindow( wnd.Gfx() );
 	// nano.ShowWindow( wnd.Gfx(),"Nano" );
-	// sponza.ShowWindow( wnd.Gfx(),"Sponza" );
+	sponza.ShowWindow( wnd.Gfx(),"Sponza" );
 
 	// present
 	wnd.Gfx().EndFrame();
