@@ -2,12 +2,16 @@
 #include "Graphics.h"
 #include "ConditionalNoexcept.h"
 
+class Drawable;
+
 namespace Bind
 {
 	class Bindable
 	{
 	public:
 		virtual void Bind( Graphics& gfx ) noexcept = 0;						// binds attributes to graphics object
+		virtual void InitializeParentReference( const Drawable& ) noexcept
+		{}
 		virtual std::string GetUID() const noexcept
 		{
 			assert( false );

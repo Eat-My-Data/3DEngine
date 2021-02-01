@@ -9,6 +9,7 @@
 #include "Mesh.h"
 #include "ScriptCommander.h"
 #include "Stencil.h"
+#include "FrameCommander.h"
 
 class App
 {
@@ -28,10 +29,11 @@ private:
 	FrameTimer timer;											// world clock
 	float speed_factor = 1.0f;									// time manipulation
 	Camera cam;													// configurable view matrix
+	FrameCommander fc;
 	PointLight light;											// configurable light source
 	TestCube cube{ wnd.Gfx(),4.0f };
 	TestCube cube2{ wnd.Gfx(),4.0f };
-	Model sponza{ wnd.Gfx(),"Models\\sponza\\sponza.obj",1.0f / 20.0f };
+	// Model sponza{ wnd.Gfx(),"Models\\sponza\\sponza.obj",1.0f / 20.0f };
 	// TestPlane bluePlane{ wnd.Gfx(),6.0f,{ 0.3f,0.3f,1.0f,0.0f } };
 	// TestPlane redPlane{ wnd.Gfx(),6.0f,{ 1.0f,0.3f,0.3f,0.0f } };
 	// Model gobber{ wnd.Gfx(),"Models\\gobber\\GoblinX.obj",6.0f };
