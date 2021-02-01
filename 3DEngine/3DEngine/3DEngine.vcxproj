@@ -256,13 +256,16 @@
     <ClInclude Include="Job.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="LayoutCodex.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="NullPixelShader.h" />
     <ClInclude Include="Pass.h" />
+    <ClInclude Include="PerfLog.h" />
     <ClInclude Include="Rasterizer.h" />
     <ClInclude Include="ScriptCommander.h" />
     <ClInclude Include="Stencil.h" />
     <ClInclude Include="Step.h" />
+    <ClInclude Include="TechniqueProbe.h" />
     <ClInclude Include="Technique.h" />
     <ClInclude Include="Testing.h" />
     <ClInclude Include="TexturePreprocessor.h" />

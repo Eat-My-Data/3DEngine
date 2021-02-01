@@ -434,6 +434,15 @@
     <ClInclude Include="Technique.h">
       <Filter>Header Files\Jobber</Filter>
     </ClInclude>
+    <ClInclude Include="PerfLog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TechniqueProbe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="3DEngine.rc">

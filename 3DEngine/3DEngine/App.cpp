@@ -6,6 +6,7 @@
 #include "imgui/imgui.h"
 #include "VertexBuffer.h"
 #include "ChiliUtil.h"
+#include "PerfLog.h"
 
 namespace dx = DirectX;
 
