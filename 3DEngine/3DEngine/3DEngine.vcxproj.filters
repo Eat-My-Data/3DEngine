@@ -46,6 +46,12 @@
     <Filter Include="Shader\Common">
       <UniqueIdentifier>{04cab0b4-d6b9-49c9-9bc4-ef062b61e397}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Jobber">
+      <UniqueIdentifier>{57fdef5c-94d4-465a-bd9c-0fb3745bef8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Jobber">
+      <UniqueIdentifier>{52e16a44-905a-404f-87b5-12233209aa61}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -189,17 +195,17 @@
     <ClCompile Include="Testing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Job.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="NullPixelShader.cpp">
       <Filter>Source Files\Bindable</Filter>
     </ClCompile>
+    <ClCompile Include="Job.cpp">
+      <Filter>Source Files\Jobber</Filter>
+    </ClCompile>
     <ClCompile Include="Technique.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Jobber</Filter>
     </ClCompile>
     <ClCompile Include="Step.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Jobber</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -410,23 +416,23 @@
     <ClInclude Include="Stencil.h">
       <Filter>Header Files\Bindable</Filter>
     </ClInclude>
-    <ClInclude Include="FrameCommander.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Job.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="NullPixelShader.h">
       <Filter>Header Files\Bindable</Filter>
     </ClInclude>
-    <ClInclude Include="Pass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Step.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Jobber</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameCommander.h">
+      <Filter>Header Files\Jobber</Filter>
+    </ClInclude>
+    <ClInclude Include="Job.h">
+      <Filter>Header Files\Jobber</Filter>
+    </ClInclude>
+    <ClInclude Include="Pass.h">
+      <Filter>Header Files\Jobber</Filter>
     </ClInclude>
     <ClInclude Include="Technique.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Jobber</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
