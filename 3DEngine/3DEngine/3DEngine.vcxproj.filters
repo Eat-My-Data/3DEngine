@@ -461,6 +461,9 @@
     <FxCompile Include="PhongPSSpecNormMask.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="GrayscaleCompute.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="imgui.natvis">

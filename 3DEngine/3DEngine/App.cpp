@@ -9,6 +9,9 @@
 
 namespace dx = DirectX;
 
+ID3DBlob* grayscaleComputeBlob = nullptr;
+ID3D11UnorderedAccessView* backBufferUAV = nullptr;
+ID3D11ComputeShader* grayscaleComputeShader = nullptr;
 
 App::App( const std::string& commandLine )
 	:
@@ -17,14 +20,20 @@ App::App( const std::string& commandLine )
 	scriptCommander( TokenizeQuoted( commandLine ) ),
 	light( wnd.Gfx() )
 {
-	//wall.SetRootTransform( dx::XMMatrixTranslation( -12.0f,0.0f,0.0f ) );
-	//tp.SetPos( { 12.0f,0.0f,0.0f } );
-	//gobber.SetRootTransform( dx::XMMatrixTranslation( 0.0f,0.0f,-4.0f ) );
-	//nano.SetRootTransform( dx::XMMatrixTranslation( 0.0f,-7.0f,6.0f ) );
-	bluePlane.SetPos( cam.GetPos() );
-	redPlane.SetPos( cam.GetPos() );
-
 	wnd.Gfx().SetProjection( dx::XMMatrixPerspectiveLH( 1.0f,9.0f / 16.0f,0.5f,400.0f ) );
+
+	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+	uavDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	uavDesc.ViewDimension = D3D11_UAV_DIMENSION::D3D11_UAV_DIMENSION_TEXTURE2D;
+	uavDesc.Texture2D.MipSlice = 0;
+	HRESULT hr = wnd.Gfx().GetDevice()->CreateUnorderedAccessView( wnd.Gfx().GetTargetTexture(), &uavDesc, &backBufferUAV );
+	
+		
+	grayscaleComputeBlob = nullptr;
+	hr = D3DReadFileToBlob( ToWide( "GrayscaleCompute.cso" ).c_str(), &grayscaleComputeBlob );
+	assert( SUCCEEDED( hr ) );
+	hr = wnd.Gfx().GetDevice()->CreateComputeShader( grayscaleComputeBlob->GetBufferPointer(), grayscaleComputeBlob->GetBufferSize(), nullptr, &grayscaleComputeShader );
+	assert( SUCCEEDED( hr ) );
 }
 
 void App::DoFrame()
@@ -34,14 +43,8 @@ void App::DoFrame()
 	wnd.Gfx().SetCamera( cam.GetMatrix() );
 	light.Bind( wnd.Gfx(),cam.GetMatrix() );
 
-	//wall.Draw( wnd.Gfx() );
-	//tp.Draw( wnd.Gfx() );
-	//nano.Draw( wnd.Gfx() );
-	//gobber.Draw( wnd.Gfx() );
 	light.Draw( wnd.Gfx() );
 	sponza.Draw( wnd.Gfx() );
-	bluePlane.Draw( wnd.Gfx() );
-	redPlane.Draw( wnd.Gfx() );
 
 	while ( const auto e = wnd.kbd.ReadKey() )
 	{
@@ -64,6 +67,26 @@ void App::DoFrame()
 			break;
 		}
 	}
+
+	if ( wnd.kbd.KeyIsPressed( 'L' ) )
+	{
+		if ( grayscaleComputeShader )
+		{
+			grayscaleComputeShader->Release();
+			grayscaleComputeShader = nullptr;
+		}
+		
+		if ( grayscaleComputeBlob )
+		{
+			grayscaleComputeBlob->Release();
+			grayscaleComputeBlob = nullptr;
+		}
+		HRESULT hr = D3DReadFileToBlob( ToWide( "GrayscaleCompute.cso" ).c_str(), &grayscaleComputeBlob );
+		assert( SUCCEEDED( hr ) );
+		hr = wnd.Gfx().GetDevice()->CreateComputeShader( grayscaleComputeBlob->GetBufferPointer(), grayscaleComputeBlob->GetBufferSize(), nullptr, &grayscaleComputeShader );
+		assert( SUCCEEDED( hr ) );
+	}
+
 
 	if ( !wnd.CursorEnabled() )
 	{
@@ -104,13 +127,30 @@ void App::DoFrame()
 	// imgui windows
 	cam.SpawnControlWindow();
 	light.SpawnControlWindow();
-	bluePlane.SpawnControlWindow( wnd.Gfx(),"Blue Plane" );
-	redPlane.SpawnControlWindow( wnd.Gfx(),"Red Plane" );
-	/*gobber.ShowWindow( wnd.Gfx(),"gobber" );
-	wall.ShowWindow( wnd.Gfx(),"Wall" );
-	tp.SpawnControlWindow( wnd.Gfx() );
-	nano.ShowWindow( wnd.Gfx(),"Nano" );*/
 	sponza.ShowWindow( wnd.Gfx(),"Sponza" );
+
+	if ( grayscaleComputeShader )
+	{
+		wnd.Gfx().GetContext()->OMSetRenderTargets( 0, nullptr, nullptr );
+
+		wnd.Gfx().GetContext()->CSSetShader( grayscaleComputeShader, nullptr, 0 );
+		wnd.Gfx().GetContext()->CSSetUnorderedAccessViews( 0, 1, &backBufferUAV, nullptr );
+
+		unsigned windowHeight = 720;
+		unsigned windowWidth = 1280;
+
+		unsigned threadsPerGroupX = 32;
+		unsigned threadsPerGroupY = 32;
+
+		unsigned dimX = ( windowWidth >> 5 ) + ( ( windowWidth & 31 ) != 0 );
+		unsigned dimY = ( windowHeight >> 5 ) + ( ( windowHeight & 31 ) != 0 );
+		unsigned dimZ = 1;
+		wnd.Gfx().GetContext()->Dispatch( dimX, dimY, dimZ );
+
+		ID3D11RenderTargetView* target = wnd.Gfx().GetTarget();
+		wnd.Gfx().GetContext()->OMSetRenderTargets( 1, &target, wnd.Gfx().GetDSV() );
+	}
+	
 
 	// present
 	wnd.Gfx().EndFrame();

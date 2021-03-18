@@ -57,7 +57,7 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	) );
 
 	// gain access to texture subresource in swap chain (back buffer)
-	wrl::ComPtr<ID3D11Resource> pBackBuffer = nullptr;
+	pBackBuffer = nullptr;
 	GFX_THROW_INFO( pSwap->GetBuffer( 0,__uuidof( ID3D11Resource ),&pBackBuffer  ) );
 	GFX_THROW_INFO( pDevice->CreateRenderTargetView(
 		pBackBuffer.Get(),
@@ -65,6 +65,26 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 		&pTarget
 	) );
 
+
+	D3D11_TEXTURE2D_DESC targetDesc = {};
+	targetDesc.Width = width;
+	targetDesc.Height = height;
+	targetDesc.MipLevels = 1;
+	targetDesc.ArraySize = 1;
+	targetDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	targetDesc.SampleDesc.Count = 1;
+	targetDesc.SampleDesc.Quality = 0;
+	targetDesc.Usage = D3D11_USAGE_DEFAULT;
+	targetDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_UNORDERED_ACCESS;
+	targetDesc.CPUAccessFlags - 0;
+	targetDesc.MiscFlags = 0;
+	GFX_THROW_INFO( pDevice->CreateTexture2D( &targetDesc, nullptr, &pMyTargetTexture ) );
+
+	GFX_THROW_INFO( pDevice->CreateRenderTargetView(
+		pMyTargetTexture.Get(),
+		nullptr,
+		&pMyTarget
+	) );
 
 	// create depth stensil descriptor
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
@@ -127,6 +147,9 @@ void Graphics::EndFrame()
 		ImGui_ImplDX11_RenderDrawData( ImGui::GetDrawData() );
 	}
 
+	// splat my target to the back buffer
+	pContext->CopyResource( pBackBuffer.Get(), pMyTargetTexture.Get() );
+
 	HRESULT hr;
 	if ( FAILED( hr = pSwap->Present( 1u,0u ) ) )
 	{
@@ -150,7 +173,9 @@ void Graphics::BeginFrame( float red,float green,float blue ) noexcept
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 	}
-
+	
+	ID3D11RenderTargetView* target = pMyTarget.Get();
+	pContext->OMSetRenderTargets( 1, &target, pDSV.Get() );
 	const float color[] = { red,green,blue,1.0f };
 	pContext->ClearRenderTargetView( pTarget.Get(),color );
 	pContext->ClearDepthStencilView( pDSV.Get(),D3D11_CLEAR_DEPTH,1.0f,0u );
