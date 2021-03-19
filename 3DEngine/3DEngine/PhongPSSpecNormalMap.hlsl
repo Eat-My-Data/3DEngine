@@ -19,56 +19,73 @@ Texture2D nmap;
 
 SamplerState splr;
 
-
-float4 main(float3 viewFragPos : Position, float3 viewNormal : Normal, float3 viewTan : Tangent, float3 viewBitan : Bitangent, float2 tc : Texcoord) : SV_Target
+struct PixelOutputType
 {
-    // sample diffuse texture 
-    float4 dtex = tex.Sample(splr, tc);
+    float4 color : SV_Target0;
+    float4 normal : SV_Target1;
+};
+
+
+PixelOutputType main(float3 viewFragPos : Position, float3 viewNormal : Normal, float3 viewTan : Tangent, float3 viewBitan : Bitangent, float2 tc : Texcoord) : SV_Target
+{
+ //   // sample diffuse texture 
+ //   float4 dtex = tex.Sample(splr, tc);
     
-    #ifdef MASK_BOI
-    // bail if highly translucent
-    clip(dtex.a < 0.1f ? -1 : 1);
-    // flip normal when backface
-    if (dot(viewNormal, viewFragPos) >= 0.0f)
-    {
-        viewNormal = -viewNormal;
-    }
-    #endif
+ //   #ifdef MASK_BOI
+ //   // bail if highly translucent
+ //   clip(dtex.a < 0.1f ? -1 : 1);
+ //   // flip normal when backface
+ //   if (dot(viewNormal, viewFragPos) >= 0.0f)
+ //   {
+ //       viewNormal = -viewNormal;
+ //   }
+ //   #endif
     
-    // normalize the mesh normal
-    viewNormal = normalize(viewNormal);
-    // replace normal with mapped if normal mapping enabled
-    if (normalMapEnabled)
-    {
-        viewNormal = MapNormal(normalize(viewTan), normalize(viewBitan), viewNormal, tc, nmap, splr);
-    }
-	// fragment to light vector data
-    const LightVectorData lv = CalculateLightVectorData(viewLightPos, viewFragPos);
-    // specular parameter determination (mapped or uniform)
-    float3 specularReflectionColor;
-    float specularPower = specularPowerConst;
-    if (specularMapEnabled)
-    {
-        const float4 specularSample = spec.Sample(splr, tc);
-        specularReflectionColor = specularSample.rgb * specularMapWeight;
-        if (hasGloss)
-        {
-            specularPower = pow(2.0f, specularSample.a * 13.0f);
-        }
-    }
-    else
-    {
-        specularReflectionColor = specularColor;
-    }
-	// attenuation
-    const float att = Attenuate(attConst, attLin, attQuad, lv.distToL);
-	// diffuse light
-    const float3 diffuse = Diffuse(diffuseColor, diffuseIntensity, att, lv.dirToL, viewNormal);
-    // specular reflected
-    const float3 specularReflected = Speculate(
-        specularReflectionColor, 1.0f, viewNormal,
-        lv.vToL, viewFragPos, att, specularPower
-    );
-    // final color = attenuate diffuse & ambient by diffuse texture color and add specular reflected
-    return float4(saturate((diffuse + ambient) * dtex.rgb + specularReflected), dtex.a);
+ //   // normalize the mesh normal
+ //   viewNormal = normalize(viewNormal);
+ //   // replace normal with mapped if normal mapping enabled
+ //   if (normalMapEnabled)
+ //   {
+ //       viewNormal = MapNormal(normalize(viewTan), normalize(viewBitan), viewNormal, tc, nmap, splr);
+ //   }
+	//// fragment to light vector data
+ //   const LightVectorData lv = CalculateLightVectorData(viewLightPos, viewFragPos);
+ //   // specular parameter determination (mapped or uniform)
+ //   float3 specularReflectionColor;
+ //   float specularPower = specularPowerConst;
+ //   if (specularMapEnabled)
+ //   {
+ //       const float4 specularSample = spec.Sample(splr, tc);
+ //       specularReflectionColor = specularSample.rgb * specularMapWeight;
+ //       if (hasGloss)
+ //       {
+ //           specularPower = pow(2.0f, specularSample.a * 13.0f);
+ //       }
+ //   }
+ //   else
+ //   {
+ //       specularReflectionColor = specularColor;
+ //   }
+	//// attenuation
+ //   const float att = Attenuate(attConst, attLin, attQuad, lv.distToL);
+	//// diffuse light
+ //   const float3 diffuse = Diffuse(diffuseColor, diffuseIntensity, att, lv.dirToL, viewNormal);
+ //   // specular reflected
+ //   const float3 specularReflected = Speculate(
+ //       specularReflectionColor, 1.0f, viewNormal,
+ //       lv.vToL, viewFragPos, att, specularPower
+ //   );
+ //   // final color = attenuate diffuse & ambient by diffuse texture color and add specular reflected
+ //   return float4(saturate((diffuse + ambient) * dtex.rgb + specularReflected), dtex.a);
+    
+    PixelOutputType output;
+
+
+    // Sample the color from the texture and store it for output to the render target.
+    output.color = tex.Sample(splr, tc);
+	
+    // Store the normal for output to the render target.
+    output.normal = float4(viewNormal, 1.0f);
+
+    return output;
 }

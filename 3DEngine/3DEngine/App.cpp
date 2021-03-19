@@ -43,8 +43,8 @@ void App::DoFrame()
 	wnd.Gfx().SetCamera( cam.GetMatrix() );
 	light.Bind( wnd.Gfx(),cam.GetMatrix() );
 
-	light.Draw( wnd.Gfx() );
 	sponza.Draw( wnd.Gfx() );
+	light.Draw( wnd.Gfx() );
 
 	while ( const auto e = wnd.kbd.ReadKey() )
 	{

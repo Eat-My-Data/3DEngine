@@ -71,27 +71,31 @@ public:
 	void EnableImgui() noexcept;									
 	void DisableImgui() noexcept;									
 	bool IsImguiEnabled() const noexcept;							// get imguiEnabled
-	ID3D11Device* GetDevice() { return pDevice.Get(); }
-	ID3D11DeviceContext* GetContext() { return pContext.Get(); }
-	ID3D11Resource* GetBackBuffer() { return pBackBuffer.Get(); }
+	ID3D11Device* GetDevice() { return pDevice; }
+	ID3D11DeviceContext* GetContext() { return pContext; }
+	/*ID3D11Resource* GetBackBuffer() { return pBackBuffer.Get(); }
 	ID3D11Texture2D* GetTargetTexture() { return pMyTargetTexture.Get(); }
-	ID3D11RenderTargetView* GetTarget() { return pMyTarget.Get(); }
-	ID3D11DepthStencilView* GetDSV() { return pDSV.Get(); }
+	ID3D11RenderTargetView* GetTarget() { return pMyTarget.Get(); }*/
+	ID3D11DepthStencilView* GetDSV() { return pDSV; }
 private:
 	DirectX::XMMATRIX projection;									// projection matrix
 	DirectX::XMMATRIX camera;										// camera matrix
 	bool imguiEnabled = true;										// allows for configuring objects
-	const int bufferCount = 2;
+	static const int bufferCount = 2;
 #ifndef NDEBUG
 	DxgiInfoManager infoManager;									// allows for directx error macros
 #endif
-	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;					// pointer to device 
-	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwap;					// pointer to swap chain
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;			// pointer to device context
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;			// pointer to render target view
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;			// poitner to depth stencil view
-	Microsoft::WRL::ComPtr<ID3D11Resource> pBackBuffer;
+	ID3D11Device* pDevice;
+	IDXGISwapChain* pSwap;
+	ID3D11DeviceContext* pContext;
+	ID3D11RenderTargetView* pTarget[bufferCount];
+	ID3D11Texture2D* pTextures[bufferCount];
+	ID3D11ShaderResourceView* pShaderView[bufferCount];
+	ID3D11DepthStencilView* pDSV;
+
+	// used in for compute shader
+	/*Microsoft::WRL::ComPtr<ID3D11Resource> pBackBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pMyTargetTexture;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pMyTarget;			// pointer to render target view
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pMyTarget;*/
 
 };

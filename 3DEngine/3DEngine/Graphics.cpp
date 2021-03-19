@@ -56,15 +56,72 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 		&pContext
 	) );
 
-	// gain access to texture subresource in swap chain (back buffer)
-	pBackBuffer = nullptr;
-	GFX_THROW_INFO( pSwap->GetBuffer( 0,__uuidof( ID3D11Resource ),&pBackBuffer  ) );
-	GFX_THROW_INFO( pDevice->CreateRenderTargetView(
-		pBackBuffer.Get(),
-		nullptr,
-		&pTarget
-	) );
+	//// gain access to texture subresource in swap chain (back buffer)
+	////pBackBuffer = nullptr;
+	////GFX_THROW_INFO( pSwap->GetBuffer( 0,__uuidof( ID3D11Resource ),&pBackBuffer  ) );
+	////GFX_THROW_INFO( pDevice->CreateRenderTargetView(
+	////	pBackBuffer.Get(),
+	////	nullptr,
+	////	&pTarget[0]
+	////) );
 
+
+	// Initialize the render target texture description.
+	D3D11_TEXTURE2D_DESC textureDesc = {};
+	// Setup the render target texture description.
+	textureDesc.Width = width;
+	textureDesc.Height = height;
+	textureDesc.MipLevels = 1;
+	textureDesc.ArraySize = 1;
+	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.MiscFlags = 0;
+
+	// Create the render target textures.
+	for ( int i = 0; i < bufferCount; i++ )
+	{
+		HRESULT result = pDevice->CreateTexture2D( &textureDesc, NULL, &pTextures[i] );
+		if ( FAILED( result ) )
+		{
+			throw HrException(__LINE__,__FILE__,result);
+		}
+	}
+
+	// Setup the description of the render target view.
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {};
+	renderTargetViewDesc.Format = textureDesc.Format;
+	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+	// Create the render target views.
+	for ( int i = 0; i < bufferCount; i++ )
+	{
+		HRESULT result = pDevice->CreateRenderTargetView( pTextures[i], &renderTargetViewDesc, &pTarget[i] );
+		if ( FAILED( result ) )
+		{
+			throw HrException( __LINE__, __FILE__, result );
+		}
+	}
+
+	// Setup the description of the shader resource view.
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
+	shaderResourceViewDesc.Format = textureDesc.Format;
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+	shaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+	// Create the shader resource views.
+	for ( int i = 0; i < bufferCount; i++ )
+	{
+		HRESULT result = pDevice->CreateShaderResourceView( pTextures[i], &shaderResourceViewDesc, &pShaderView[i] );
+		if ( FAILED( result ) )
+		{
+			throw HrException( __LINE__, __FILE__, result );
+		}
+	}
 
 	/*D3D11_TEXTURE2D_DESC targetDesc = {};
 	targetDesc.Width = width;
@@ -122,7 +179,7 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	) );
 
 	// bind depth stensil view to OM
-	pContext->OMSetRenderTargets( 1u,pTarget.GetAddressOf(),pDSV.Get() );
+	pContext->OMSetRenderTargets( bufferCount,pTarget,pDSV );
 
 	// configure viewport
 	D3D11_VIEWPORT vp;
@@ -135,7 +192,7 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	pContext->RSSetViewports( 1u,&vp );
 
 	// init imgui d3d impl
-	ImGui_ImplDX11_Init( pDevice.Get(),pContext.Get() );
+	ImGui_ImplDX11_Init( pDevice,pContext );
 }
 
 void Graphics::EndFrame()
@@ -177,8 +234,13 @@ void Graphics::BeginFrame( float red,float green,float blue ) noexcept
 	/*ID3D11RenderTargetView* target = pMyTarget.Get();
 	pContext->OMSetRenderTargets( 1, &target, pDSV.Get() );*/
 	const float color[] = { red,green,blue,1.0f };
-	pContext->ClearRenderTargetView( pTarget.Get(),color );
-	pContext->ClearDepthStencilView( pDSV.Get(),D3D11_CLEAR_DEPTH,1.0f,0u );
+	// Clear the render target buffers.
+	for ( int i = 0; i < bufferCount; i++ )
+	{
+		pContext->ClearRenderTargetView( pTarget[i], color );
+	}
+
+	pContext->ClearDepthStencilView( pDSV,D3D11_CLEAR_DEPTH,1.0f,0u );
 }
 
 void Graphics::DrawIndexed( UINT count ) noxnd
