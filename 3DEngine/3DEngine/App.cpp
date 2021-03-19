@@ -9,9 +9,9 @@
 
 namespace dx = DirectX;
 
-ID3DBlob* grayscaleComputeBlob = nullptr;
-ID3D11UnorderedAccessView* backBufferUAV = nullptr;
-ID3D11ComputeShader* grayscaleComputeShader = nullptr;
+//ID3DBlob* grayscaleComputeBlob = nullptr;
+//ID3D11UnorderedAccessView* backBufferUAV = nullptr;
+//ID3D11ComputeShader* grayscaleComputeShader = nullptr;
 
 App::App( const std::string& commandLine )
 	:
@@ -22,7 +22,7 @@ App::App( const std::string& commandLine )
 {
 	wnd.Gfx().SetProjection( dx::XMMatrixPerspectiveLH( 1.0f,9.0f / 16.0f,0.5f,400.0f ) );
 
-	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+	/*D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 	uavDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	uavDesc.ViewDimension = D3D11_UAV_DIMENSION::D3D11_UAV_DIMENSION_TEXTURE2D;
 	uavDesc.Texture2D.MipSlice = 0;
@@ -33,7 +33,7 @@ App::App( const std::string& commandLine )
 	hr = D3DReadFileToBlob( ToWide( "GrayscaleCompute.cso" ).c_str(), &grayscaleComputeBlob );
 	assert( SUCCEEDED( hr ) );
 	hr = wnd.Gfx().GetDevice()->CreateComputeShader( grayscaleComputeBlob->GetBufferPointer(), grayscaleComputeBlob->GetBufferSize(), nullptr, &grayscaleComputeShader );
-	assert( SUCCEEDED( hr ) );
+	assert( SUCCEEDED( hr ) );*/
 }
 
 void App::DoFrame()
@@ -68,7 +68,7 @@ void App::DoFrame()
 		}
 	}
 
-	if ( wnd.kbd.KeyIsPressed( 'L' ) )
+	/*if ( wnd.kbd.KeyIsPressed( 'L' ) )
 	{
 		if ( grayscaleComputeShader )
 		{
@@ -85,7 +85,7 @@ void App::DoFrame()
 		assert( SUCCEEDED( hr ) );
 		hr = wnd.Gfx().GetDevice()->CreateComputeShader( grayscaleComputeBlob->GetBufferPointer(), grayscaleComputeBlob->GetBufferSize(), nullptr, &grayscaleComputeShader );
 		assert( SUCCEEDED( hr ) );
-	}
+	}*/
 
 
 	if ( !wnd.CursorEnabled() )
@@ -129,7 +129,7 @@ void App::DoFrame()
 	light.SpawnControlWindow();
 	sponza.ShowWindow( wnd.Gfx(),"Sponza" );
 
-	if ( grayscaleComputeShader )
+	/*if ( grayscaleComputeShader )
 	{
 		wnd.Gfx().GetContext()->OMSetRenderTargets( 0, nullptr, nullptr );
 
@@ -149,7 +149,7 @@ void App::DoFrame()
 
 		ID3D11RenderTargetView* target = wnd.Gfx().GetTarget();
 		wnd.Gfx().GetContext()->OMSetRenderTargets( 1, &target, wnd.Gfx().GetDSV() );
-	}
+	}*/
 	
 
 	// present

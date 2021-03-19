@@ -66,7 +66,7 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	) );
 
 
-	D3D11_TEXTURE2D_DESC targetDesc = {};
+	/*D3D11_TEXTURE2D_DESC targetDesc = {};
 	targetDesc.Width = width;
 	targetDesc.Height = height;
 	targetDesc.MipLevels = 1;
@@ -84,7 +84,7 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 		pMyTargetTexture.Get(),
 		nullptr,
 		&pMyTarget
-	) );
+	) );*/
 
 	// create depth stensil descriptor
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
@@ -147,8 +147,8 @@ void Graphics::EndFrame()
 		ImGui_ImplDX11_RenderDrawData( ImGui::GetDrawData() );
 	}
 
-	// splat my target to the back buffer
-	pContext->CopyResource( pBackBuffer.Get(), pMyTargetTexture.Get() );
+	//// splat my target to the back buffer
+	//pContext->CopyResource( pBackBuffer.Get(), pMyTargetTexture.Get() );
 
 	HRESULT hr;
 	if ( FAILED( hr = pSwap->Present( 1u,0u ) ) )
@@ -174,8 +174,8 @@ void Graphics::BeginFrame( float red,float green,float blue ) noexcept
 		ImGui::NewFrame();
 	}
 	
-	ID3D11RenderTargetView* target = pMyTarget.Get();
-	pContext->OMSetRenderTargets( 1, &target, pDSV.Get() );
+	/*ID3D11RenderTargetView* target = pMyTarget.Get();
+	pContext->OMSetRenderTargets( 1, &target, pDSV.Get() );*/
 	const float color[] = { red,green,blue,1.0f };
 	pContext->ClearRenderTargetView( pTarget.Get(),color );
 	pContext->ClearDepthStencilView( pDSV.Get(),D3D11_CLEAR_DEPTH,1.0f,0u );
