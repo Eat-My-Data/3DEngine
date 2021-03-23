@@ -68,7 +68,6 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 
 	// Initialize the render target texture description.
 	D3D11_TEXTURE2D_DESC textureDesc = {};
-	// Setup the render target texture description.
 	textureDesc.Width = width;
 	textureDesc.Height = height;
 	textureDesc.MipLevels = 1;

@@ -175,6 +175,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ChiliUtil.cpp" />
     <ClCompile Include="ChiliXM.cpp" />
+    <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="DxgiInfoManager.cpp" />
@@ -232,6 +233,7 @@
     <ClInclude Include="ConstantBuffers.h" />
     <ClInclude Include="ConstantBuffersEx.h" />
     <ClInclude Include="Cube.h" />
+    <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="DxgiInfoManager.h" />
     <ClInclude Include="DynamicConstant.h" />

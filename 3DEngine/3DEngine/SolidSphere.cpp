@@ -3,7 +3,6 @@
 #include "GraphicsThrowMacros.h"
 #include "Vertex.h"
 #include "Sphere.h"
-#include "Vertex.h"
 
 SolidSphere::SolidSphere( Graphics& gfx,float radius )
 {
@@ -16,11 +15,11 @@ SolidSphere::SolidSphere( Graphics& gfx,float radius )
 	AddBind( VertexBuffer::Resolve( gfx,geometryTag,model.vertices ) );
 	AddBind( IndexBuffer::Resolve( gfx,geometryTag,model.indices ) );
 
-	auto pvs = VertexShader::Resolve( gfx,"LightVS.cso" );
+	auto pvs = VertexShader::Resolve( gfx,"SolidVS.cso" );
 	auto pvsbc = pvs->GetBytecode();
 	AddBind( std::move( pvs ) );
 
-	AddBind( PixelShader::Resolve( gfx,"LightPS.cso" ) );
+	AddBind( PixelShader::Resolve( gfx,"SolidPS.cso" ) );
 
 	struct PSColorConstant
 	{
@@ -29,30 +28,7 @@ SolidSphere::SolidSphere( Graphics& gfx,float radius )
 	} colorConst;
 	AddBind( PixelConstantBuffer<PSColorConstant>::Resolve( gfx,colorConst,1u ) );
 
-	AddBind( Sampler::Resolve( gfx ) );
-
-	Dvtx::VertexBuffer vbuf( std::move(
-		Dvtx::VertexLayout{}
-		.Append( Dvtx::VertexLayout::Position3D )
-		.Append( Dvtx::VertexLayout::Texture2D )
-	) );
-
-	D3D11_BUFFER_DESC lightBufferDesc;
-	lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	lightBufferDesc.ByteWidth = sizeof( LightBufferType );
-	lightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	lightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	lightBufferDesc.MiscFlags = 0;
-	lightBufferDesc.StructureByteStride = 0;
-
-	// Create the constant buffer pointer so we can access the pixel shader constant buffer from within this class.
-	HRESULT result = gfx.GetDevice()->CreateBuffer( &lightBufferDesc, NULL, &m_lightBuffer );
-	if ( FAILED( result ) )
-	{
-		throw ChiliException( __LINE__,__FILE__ );
-	}
-
-	AddBind( InputLayout::Resolve( gfx,vbuf.GetLayout(),pvsbc ) );
+	AddBind( InputLayout::Resolve( gfx,model.vertices.GetLayout(),pvsbc ) );
 
 	AddBind( Topology::Resolve( gfx,D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
 	

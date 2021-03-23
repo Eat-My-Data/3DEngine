@@ -17,10 +17,10 @@ struct VSOut
 
 float4 main(VSOut input) : SV_TARGET
 {
-    // Sample the colors from the color render texture using the point sampler at this texture coordinate location.
+    // Sample the colors from the color render texture
     float4 colors = colorTexture.Sample(SampleTypePoint, input.tex);
 
-    // Sample the normals from the normal render texture using the point sampler at this texture coordinate location.
+    // Sample the normals from the normal render texture
     float4 normals = normalTexture.Sample(SampleTypePoint, input.tex);
 
     // Invert the light direction for calculations.
