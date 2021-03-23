@@ -12,6 +12,7 @@ public:
 	void Reset() noexcept;													// resets cbData to default values
 	void Draw( Graphics& gfx ) const noxnd;									// update mesh pos from imgui, call mesh's draw function
 	void Bind( Graphics& gfx, DirectX::FXMMATRIX view ) const noexcept;		// set position with view transformation, update and bind cbuf
+	SolidSphere& GetMesh() { return mesh; }
 private:
 	// constant buffer values
 	struct PointLightCBuf

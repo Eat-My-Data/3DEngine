@@ -464,6 +464,15 @@
     <FxCompile Include="GrayscaleCompute.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="ComputeParticlesVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="ComputeParticlesPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="ComputeParticles.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="imgui.natvis">
