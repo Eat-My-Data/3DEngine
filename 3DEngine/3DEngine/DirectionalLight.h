@@ -4,16 +4,11 @@
 class DirectionalLight : public Drawable
 {
 public:
-	DirectionalLight( Graphics& gfx, float size );
+	DirectionalLight( Graphics& gfx );
 	void SetDirection( DirectX::XMFLOAT3 direction ) noexcept;
 	void SpawnControlWindow( Graphics& gfx ) noexcept;
+	DirectX::XMMATRIX GetTransformXM() const noexcept override;
 private:
-	struct LightBufferType
-	{
-		DirectX::XMFLOAT3 lightDirection;
-		float padding;
-	};
-private:
-	DirectX::XMFLOAT3 lightDirection;
+	//DirectX::XMFLOAT3 lightDirection;
 	ID3D11Buffer* m_lightBuffer;
 };

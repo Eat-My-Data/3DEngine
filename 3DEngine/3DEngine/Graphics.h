@@ -73,9 +73,9 @@ public:
 	bool IsImguiEnabled() const noexcept;							// get imguiEnabled
 	ID3D11Device* GetDevice() { return pDevice; }
 	ID3D11DeviceContext* GetContext() { return pContext; }
-	/*ID3D11Resource* GetBackBuffer() { return pBackBuffer.Get(); }
+	ID3D11Resource* GetBackBuffer() { return pBackBuffer.Get(); }
 	ID3D11Texture2D* GetTargetTexture() { return pMyTargetTexture.Get(); }
-	ID3D11RenderTargetView* GetTarget() { return pMyTarget.Get(); }*/
+	ID3D11RenderTargetView* GetTarget() { return pMyTarget.Get(); }
 	ID3D11DepthStencilView* GetDSV() { return pDSV; }
 private:
 	DirectX::XMMATRIX projection;									// projection matrix
@@ -94,8 +94,8 @@ private:
 	ID3D11DepthStencilView* pDSV;
 
 	// used in for compute shader
-	/*Microsoft::WRL::ComPtr<ID3D11Resource> pBackBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Resource> pBackBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pMyTargetTexture;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pMyTarget;*/
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pMyTarget;
 
 };

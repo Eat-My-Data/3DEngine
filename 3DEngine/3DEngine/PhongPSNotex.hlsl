@@ -21,6 +21,10 @@ PSOut main(float3 viewFragPos : Position, float3 viewNormal : Normal) : SV_Targe
     
     output.color = materialColor;
     	
+    // 0 to 1 for normal
+    viewNormal = normalize(viewNormal);
+    viewNormal = (viewNormal + 1) / 2;
+    
     // Store the normal for output to the render target.
     output.normal = float4(viewNormal, 1.0f);
 

@@ -122,6 +122,11 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 		}
 	}
 
+	for ( int i = 0; i < bufferCount; i++ )
+	{
+		pTextures[i]->Release();
+	}
+
 	/*D3D11_TEXTURE2D_DESC targetDesc = {};
 	targetDesc.Width = width;
 	targetDesc.Height = height;

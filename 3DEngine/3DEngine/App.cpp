@@ -18,7 +18,7 @@ App::App( const std::string& commandLine )
 	commandLine(commandLine),
 	wnd( 1280,720,"The Donkey Fart Box"),
 	scriptCommander( TokenizeQuoted( commandLine ) ),
-	light( wnd.Gfx() )
+	dirLight( wnd.Gfx() )
 {
 	wnd.Gfx().SetProjection( dx::XMMatrixPerspectiveLH( 1.0f,9.0f / 16.0f,0.5f,400.0f ) );
 
@@ -41,10 +41,11 @@ void App::DoFrame()
 	const auto dt = timer.Mark() * speed_factor;
 	wnd.Gfx().BeginFrame( 0.07f,0.0f,0.12f );
 	wnd.Gfx().SetCamera( cam.GetMatrix() );
-	light.Bind( wnd.Gfx(),cam.GetMatrix() );
+	//light.Bind( wnd.Gfx(),cam.GetMatrix() );
 
 	sponza.Draw( wnd.Gfx() );
-	light.Draw( wnd.Gfx() );
+	//light.Draw( wnd.Gfx() );
+	dirLight.Draw( wnd.Gfx() );
 
 	while ( const auto e = wnd.kbd.ReadKey() )
 	{
@@ -126,7 +127,7 @@ void App::DoFrame()
 
 	// imgui windows
 	cam.SpawnControlWindow();
-	light.SpawnControlWindow();
+	//light.SpawnControlWindow();
 	sponza.ShowWindow( wnd.Gfx(),"Sponza" );
 
 	/*if ( grayscaleComputeShader )
