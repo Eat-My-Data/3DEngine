@@ -45,7 +45,7 @@ void App::DoFrame()
 
 	sponza.Draw( wnd.Gfx() );
 	//light.Draw( wnd.Gfx() );
-	dirLight.Draw( wnd.Gfx() );
+	dirLight.DrawDirLight( wnd.Gfx() );
 
 	while ( const auto e = wnd.kbd.ReadKey() )
 	{

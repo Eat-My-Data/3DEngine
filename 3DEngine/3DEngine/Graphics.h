@@ -77,6 +77,10 @@ public:
 	ID3D11Texture2D* GetTargetTexture() { return pMyTargetTexture.Get(); }
 	ID3D11RenderTargetView* GetTarget() { return pMyTarget.Get(); }
 	ID3D11DepthStencilView* GetDSV() { return pDSV; }
+	ID3D11ShaderResourceView* GetColorResource() { return pShaderView[0]; }
+	ID3D11ShaderResourceView* GetNormalResource() { return pShaderView[1]; }
+	ID3D11ShaderResourceView** GetShaderResources() { return pShaderView; }
+
 private:
 	DirectX::XMMATRIX projection;									// projection matrix
 	DirectX::XMMATRIX camera;										// camera matrix

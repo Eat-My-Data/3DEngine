@@ -17,6 +17,7 @@ public:
 	Drawable( const Drawable& ) = delete;
 	virtual DirectX::XMMATRIX GetTransformXM() const noexcept = 0;		// virtual getter for transform matrix
 	void Draw( Graphics& gfx ) const noxnd;								// binds all attributes to model, and calls DrawIndexed
+	void DrawDirLight( Graphics& gfx );
 	virtual ~Drawable() = default;										// esure destruction of derived class
 	template<class T>
 	T* QueryBindable() noexcept											// find bindable of type T
