@@ -87,7 +87,7 @@ private:
 	DirectX::XMMATRIX projection;									// projection matrix
 	DirectX::XMMATRIX camera;										// camera matrix
 	bool imguiEnabled = true;										// allows for configuring objects
-	static const int bufferCount = 2;
+	static const int bufferCount = 3;
 #ifndef NDEBUG
 	DxgiInfoManager infoManager;									// allows for directx error macros
 #endif

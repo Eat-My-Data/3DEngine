@@ -1,5 +1,6 @@
 Texture2D colorTexture : register(t0);
 Texture2D normalTexture : register(t1);
+Texture2D specularTexture : register(t2);
 
 SamplerState SampleTypePoint : register(s0);
 
@@ -18,6 +19,8 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     // Sample the normals from the normal render texture
     float4 normals = normalTexture.Sample(SampleTypePoint, tex);
 
+    float4 specular = specularTexture.Sample(SampleTypePoint, tex);
+    
     // Invert the light direction for calculations.
     //float3 lightDir = -lightDirection;
 
@@ -25,7 +28,7 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     float lightIntensity = saturate(dot(normals.xyz, normalize(lightDirection)));
 
     // Determine the final amount of diffuse color based on the color of the pixel combined with the light intensity.
-    float4 outputColor = saturate(colors * lightIntensity);
+    float4 outputColor = saturate(colors * lightIntensity * specular);
 
     return outputColor;
 }
