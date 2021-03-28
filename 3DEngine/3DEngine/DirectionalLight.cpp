@@ -19,7 +19,12 @@ DirectionalLight::DirectionalLight( Graphics& gfx )
 	AddBind( Sampler::Resolve( gfx ) );
 
 	// Create the constant buffer pointer so we can access the pixel shader constant buffer from within this class.
-	AddBind( PixelConstantBuffer<LightBufferType>::Resolve( gfx,lbuf,1u ) );
+	struct LightBufferType
+	{
+		DirectX::XMFLOAT3 lightDirection = { 0.0f, 1.0f, 1.0f };
+		float padding;
+	} lbuf;
+	AddBind( PixelConstantBuffer<LightBufferType>::Resolve( gfx,lbuf,0u ) );
 
 	AddBind( Topology::Resolve( gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
 

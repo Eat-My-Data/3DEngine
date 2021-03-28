@@ -56,23 +56,13 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 		&pContext
 	) );
 
-	//// gain access to texture subresource in swap chain (back buffer)
-	////pBackBuffer = nullptr;
-	////GFX_THROW_INFO( pSwap->GetBuffer( 0,__uuidof( ID3D11Resource ),&pBackBuffer  ) );
-	////GFX_THROW_INFO( pDevice->CreateRenderTargetView(
-	////	pBackBuffer.Get(),
-	////	nullptr,
-	////	&pTarget[0]
-	////) );
-
-
 	// Initialize the render target texture description.
 	D3D11_TEXTURE2D_DESC textureDesc = {};
 	textureDesc.Width = width;
 	textureDesc.Height = height;
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
-	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
 	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
@@ -94,6 +84,10 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	renderTargetViewDesc.Format = textureDesc.Format;
 	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+	// back buffer that gets presented
+	pSwap->GetBuffer( 0, __uuidof( ID3D11Resource ),&pBackBuffer );
+	pDevice->CreateRenderTargetView( pBackBuffer.Get(), nullptr, &lightBuffer );
 
 	// Create the render target views.
 	for ( int i = 0; i < bufferCount; i++ )
@@ -122,31 +116,6 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 		}
 	}
 
-	/*for ( int i = 0; i < bufferCount; i++ )
-	{
-		pTextures[i]->Release();
-	}*/
-
-	/*D3D11_TEXTURE2D_DESC targetDesc = {};
-	targetDesc.Width = width;
-	targetDesc.Height = height;
-	targetDesc.MipLevels = 1;
-	targetDesc.ArraySize = 1;
-	targetDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	targetDesc.SampleDesc.Count = 1;
-	targetDesc.SampleDesc.Quality = 0;
-	targetDesc.Usage = D3D11_USAGE_DEFAULT;
-	targetDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_UNORDERED_ACCESS;
-	targetDesc.CPUAccessFlags - 0;
-	targetDesc.MiscFlags = 0;
-	GFX_THROW_INFO( pDevice->CreateTexture2D( &targetDesc, nullptr, &pMyTargetTexture ) );
-
-	GFX_THROW_INFO( pDevice->CreateRenderTargetView(
-		pMyTargetTexture.Get(),
-		nullptr,
-		&pMyTarget
-	) );*/
-
 	// create depth stensil descriptor
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
 	dsDesc.DepthEnable = TRUE;
@@ -157,7 +126,6 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 
 	// bind depth state
 	pContext->OMSetDepthStencilState( pDSState.Get(),1u );
-
 
 	// create depth stensil texture
 	wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
@@ -182,9 +150,6 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 		pDepthStencil.Get(),&descDSV,&pDSV
 	) );
 
-	// bind depth stensil view to OM
-	pContext->OMSetRenderTargets( bufferCount,pTarget,pDSV );
-
 	// configure viewport
 	D3D11_VIEWPORT vp;
 	vp.Width = (float)width;
@@ -207,9 +172,6 @@ void Graphics::EndFrame()
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData( ImGui::GetDrawData() );
 	}
-
-	//// splat my target to the back buffer
-	//pContext->CopyResource( pBackBuffer.Get(), pMyTargetTexture.Get() );
 
 	HRESULT hr;
 	if ( FAILED( hr = pSwap->Present( 1u,0u ) ) )
@@ -234,16 +196,15 @@ void Graphics::BeginFrame( float red,float green,float blue ) noexcept
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 	}
-	
-	/*ID3D11RenderTargetView* target = pMyTarget.Get();
-	pContext->OMSetRenderTargets( 1, &target, pDSV.Get() );*/
+
+	pContext->OMSetRenderTargets( bufferCount, pTarget, pDSV );
+
 	const float color[] = { red,green,blue,1.0f };
 	// Clear the render target buffers.
 	for ( int i = 0; i < bufferCount; i++ )
 	{
 		pContext->ClearRenderTargetView( pTarget[i], color );
 	}
-
 	pContext->ClearDepthStencilView( pDSV,D3D11_CLEAR_DEPTH,1.0f,0u );
 }
 

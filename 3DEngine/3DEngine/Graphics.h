@@ -74,9 +74,11 @@ public:
 	ID3D11Device* GetDevice() { return pDevice; }
 	ID3D11DeviceContext* GetContext() { return pContext; }
 	ID3D11Resource* GetBackBuffer() { return pBackBuffer.Get(); }
-	ID3D11Texture2D* GetTargetTexture() { return pMyTargetTexture.Get(); }
-	ID3D11RenderTargetView* GetTarget() { return pMyTarget.Get(); }
+	//ID3D11Texture2D* GetTargetTexture() { return pMyTargetTexture.Get(); }
+	//ID3D11RenderTargetView* GetTarget() { return pMyTarget.Get(); }
+	ID3D11RenderTargetView** GetPTarget() { return pTarget; }
 	ID3D11DepthStencilView* GetDSV() { return pDSV; }
+	ID3D11RenderTargetView** GetLightBuffer() { return &lightBuffer; }
 	ID3D11ShaderResourceView* GetColorResource() { return pShaderView[0]; }
 	ID3D11ShaderResourceView* GetNormalResource() { return pShaderView[1]; }
 	ID3D11ShaderResourceView** GetShaderResources() { return pShaderView; }
@@ -92,14 +94,17 @@ private:
 	ID3D11Device* pDevice;
 	IDXGISwapChain* pSwap;
 	ID3D11DeviceContext* pContext;
+
 	ID3D11RenderTargetView* pTarget[bufferCount];
-	ID3D11Texture2D* pTextures[bufferCount];
+	ID3D11Texture2D* pTextures[3];
 	ID3D11ShaderResourceView* pShaderView[bufferCount];
+
 	ID3D11DepthStencilView* pDSV;
 
+	ID3D11RenderTargetView* lightBuffer;
 	// used in for compute shader
 	Microsoft::WRL::ComPtr<ID3D11Resource> pBackBuffer;
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> pMyTargetTexture;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pMyTarget;
+	//Microsoft::WRL::ComPtr<ID3D11Texture2D> pMyTargetTexture;
+	//Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pMyTarget;
 
 };

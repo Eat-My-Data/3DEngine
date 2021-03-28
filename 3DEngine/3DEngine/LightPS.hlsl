@@ -19,10 +19,10 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     float4 normals = normalTexture.Sample(SampleTypePoint, tex);
 
     // Invert the light direction for calculations.
-    float3 lightDir = -lightDirection;
+    //float3 lightDir = -lightDirection;
 
     // Calculate the amount of light on this pixel.
-    float lightIntensity = saturate(dot(normals.xyz, lightDir));
+    float lightIntensity = saturate(dot(normals.xyz, normalize(lightDirection)));
 
     // Determine the final amount of diffuse color based on the color of the pixel combined with the light intensity.
     float4 outputColor = saturate(colors * lightIntensity);
