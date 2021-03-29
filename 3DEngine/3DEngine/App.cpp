@@ -15,10 +15,11 @@ namespace dx = DirectX;
 
 App::App( const std::string& commandLine )
 	:
-	commandLine(commandLine),
-	wnd( 1280,720,"The Donkey Fart Box"),
+	commandLine( commandLine ),
+	wnd( 1280, 720, "The Donkey Fart Box" ),
 	scriptCommander( TokenizeQuoted( commandLine ) ),
-	dirLight( wnd.Gfx() )
+	dirLight( wnd.Gfx() ),
+	light( wnd.Gfx(), 5.0f )
 {
 	wnd.Gfx().SetProjection( dx::XMMatrixPerspectiveLH( 1.0f,9.0f / 16.0f,0.5f,400.0f ) );
 
@@ -44,7 +45,7 @@ void App::DoFrame()
 	//light.Bind( wnd.Gfx(),cam.GetMatrix() );
 
 	sponza.Draw( wnd.Gfx() );
-	//light.Draw( wnd.Gfx() );
+	light.Draw( wnd.Gfx() );
 	dirLight.DrawDirLight( wnd.Gfx() );
 
 	while ( const auto e = wnd.kbd.ReadKey() )

@@ -476,6 +476,12 @@
     <FxCompile Include="LightVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="PointLightVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="PointLightPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="imgui.natvis">

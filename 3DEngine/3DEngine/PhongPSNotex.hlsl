@@ -11,14 +11,16 @@ cbuffer ObjectCBuf
 
 struct PSOut
 {
-    float4 color : SV_Target0;
-    float4 normal : SV_Target1;
+    float4 position : SV_Target0;
+    float4 color : SV_Target1;
+    float4 normal : SV_Target2;
 };
 
 PSOut main(float3 viewFragPos : Position, float3 viewNormal : Normal) : SV_Target
 {
     PSOut output;
     
+    output.position = float4(viewFragPos, 1.0f);
     output.color = materialColor;
     	
     // 0 to 1 for normal

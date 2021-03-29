@@ -1,65 +1,51 @@
+
 #include "PointLight.h"
-#include "imgui/imgui.h"
+#include "BindableCommon.h"
+#include "GraphicsThrowMacros.h"
+#include "Vertex.h"
+#include "Sphere.h"
 
-PointLight::PointLight( Graphics& gfx,float radius )
-	:
-	mesh( gfx,radius ),
-	cbuf( gfx )
+PointLight::PointLight( Graphics& gfx, float radius )
 {
-	Reset();
-}
+	using namespace Bind;
+	namespace dx = DirectX;
 
-void PointLight::SpawnControlWindow() noexcept
-{
-	if ( ImGui::Begin( "Light" ) )
+	auto model = Sphere::Make();
+	model.Transform( dx::XMMatrixScaling( radius, radius, radius ) );
+	const auto geometryTag = "$sphere." + std::to_string( radius );
+	AddBind( VertexBuffer::Resolve( gfx, geometryTag, model.vertices ) );
+	AddBind( IndexBuffer::Resolve( gfx, geometryTag, model.indices ) );
+
+	auto pvs = VertexShader::Resolve( gfx, "PointLightVS.cso" );
+	auto pvsbc = pvs->GetBytecode();
+	AddBind( std::move( pvs ) );
+
+	AddBind( PixelShader::Resolve( gfx, "PointLightPS.cso" ) );
+
+	struct PSColorConstant
 	{
-		ImGui::Text( "Position" );
-		ImGui::SliderFloat( "X",&cbData.pos.x,-60.0f,60.0f,"%.1f" );
-		ImGui::SliderFloat( "Y",&cbData.pos.y,-60.0f,60.0f,"%.1f" );
-		ImGui::SliderFloat( "Z",&cbData.pos.z,-60.0f,60.0f,"%.1f" );
-		
-		ImGui::Text( "Intensity/Color" );
-		ImGui::SliderFloat( "Intensity",&cbData.diffuseIntensity,0.1f,2.0f,"%.2f" );
-		ImGui::ColorEdit3( "Diffuse Color",&cbData.diffuseColor.x );
-		ImGui::ColorEdit3( "Ambient",&cbData.ambient.x );
+		dx::XMFLOAT3 color = { 1.0f,1.0f,1.0f };
+		float padding;
+	} colorConst;
+	AddBind( PixelConstantBuffer<PSColorConstant>::Resolve( gfx, colorConst, 1u ) );
 
-		ImGui::Text( "Falloff" );
-		ImGui::SliderFloat( "Constant",&cbData.attConst,0.05f,10.0f,"%.2f" );
-		ImGui::SliderFloat( "Linear",&cbData.attLin, 0.0001f, 4.0f,"%.4f" );
-		ImGui::SliderFloat( "Quadratic",&cbData.attQuad, 0.0000001f, 10.0f,"%.7f" );
+	AddBind( InputLayout::Resolve( gfx, model.vertices.GetLayout(), pvsbc ) );
 
-		if ( ImGui::Button( "Reset" ) )
-		{
-			Reset();
-		}
-	}
-	ImGui::End();
+	AddBind( Topology::Resolve( gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
+
+	AddBind( std::make_shared<TransformCbuf>( gfx, *this ) );
+
+	AddBind( Blender::Resolve( gfx, false ) );
+
+	AddBind( Rasterizer::Resolve( gfx, false ) );
 }
 
-void PointLight::Reset() noexcept
+void PointLight::SetDirection( DirectX::XMFLOAT3 pos ) noexcept
 {
-	cbData = {
-		{ 10.0f,9.0f,2.5f },
-		{ 0.05f,0.05f,0.05f },
-		{ 1.0f,1.0f,1.0f },
-		1.0f,
-		1.0f,
-		0.045f,
-		0.0075f,
-	};
+	//this->pos = pos;
 }
 
-void PointLight::Draw( Graphics& gfx ) const noxnd
+DirectX::XMMATRIX PointLight::GetTransformXM() const noexcept
 {
-	mesh.SetPos( cbData.pos );
-	mesh.Draw( gfx );
-}
-
-void PointLight::Bind( Graphics& gfx,DirectX::FXMMATRIX view ) const noexcept
-{
-	auto dataCopy = cbData;
-	const auto pos = DirectX::XMLoadFloat3( &cbData.pos );
-	DirectX::XMStoreFloat3( &dataCopy.pos,DirectX::XMVector3Transform( pos,view ) );
-	cbuf.Update(gfx, dataCopy);
-	cbuf.Bind( gfx );
+	return DirectX::XMMatrixTranslation( 1.0f, 1.0f, 1.0f );
 }

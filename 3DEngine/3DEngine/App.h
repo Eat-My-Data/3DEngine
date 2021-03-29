@@ -28,7 +28,7 @@ private:
 	FrameTimer timer;											// world clock
 	float speed_factor = 1.0f;									// time manipulation
 	Camera cam;													// configurable view matrix
-	//PointLight light;											// configurable light source
+	PointLight light;											// configurable light source
 	Model sponza{ wnd.Gfx(),"Models\\sponza\\sponza.obj",1.0f / 20.0f };
 	DirectionalLight dirLight;
 };
