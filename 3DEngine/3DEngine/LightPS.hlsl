@@ -31,5 +31,5 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     // Determine the final amount of diffuse color based on the color of the pixel combined with the light intensity.
     float4 outputColor = saturate(colors * lightIntensity * specular.w);
 
-    return outputColor;
+    return outputColor * float4(0.5, 0.5, 0.5, 1);
 }

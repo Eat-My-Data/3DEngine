@@ -21,6 +21,7 @@ PointLight::PointLight( Graphics& gfx, float radius )
 	AddBind( std::move( pvs ) );
 
 	AddBind( PixelShader::Resolve( gfx, "PointLightPS.cso" ) );
+	AddBind( Sampler::Resolve( gfx ) );
 
 	struct PSColorConstant
 	{
@@ -29,20 +30,20 @@ PointLight::PointLight( Graphics& gfx, float radius )
 	} colorConst;
 	AddBind( PixelConstantBuffer<PSColorConstant>::Resolve( gfx, colorConst, 1u ) );
 
-	AddBind( InputLayout::Resolve( gfx, model.vertices.GetLayout(), pvsbc ) );
+	Dvtx::VertexBuffer vbuf( std::move(
+		Dvtx::VertexLayout{}
+		.Append( Dvtx::VertexLayout::Position3D )
+	) );
+	AddBind( InputLayout::Resolve( gfx, vbuf.GetLayout(), pvsbc ) );
 
 	AddBind( Topology::Resolve( gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
-
-	AddBind( std::make_shared<TransformCbuf>( gfx, *this ) );
-
-	AddBind( Blender::Resolve( gfx, false ) );
 
 	AddBind( Rasterizer::Resolve( gfx, false ) );
 }
 
 void PointLight::SetDirection( DirectX::XMFLOAT3 pos ) noexcept
 {
-	//this->pos = pos;
+	this->pos = pos;
 }
 
 DirectX::XMMATRIX PointLight::GetTransformXM() const noexcept
