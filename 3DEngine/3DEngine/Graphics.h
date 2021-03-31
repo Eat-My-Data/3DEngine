@@ -82,12 +82,12 @@ public:
 	ID3D11ShaderResourceView* GetColorResource() { return pShaderView[0]; }
 	ID3D11ShaderResourceView* GetNormalResource() { return pShaderView[1]; }
 	ID3D11ShaderResourceView** GetShaderResources() { return pShaderView; }
-
+	ID3D11ShaderResourceView** GetDepthResource() { return &depthShaderView; }
 private:
 	DirectX::XMMATRIX projection;									// projection matrix
 	DirectX::XMMATRIX camera;										// camera matrix
 	bool imguiEnabled = true;										// allows for configuring objects
-	static const int bufferCount = 4;
+	static const int bufferCount = 3;
 #ifndef NDEBUG
 	DxgiInfoManager infoManager;									// allows for directx error macros
 #endif
@@ -98,6 +98,7 @@ private:
 	ID3D11RenderTargetView* pTarget[bufferCount];
 	ID3D11Texture2D* pTextures[bufferCount];
 	ID3D11ShaderResourceView* pShaderView[bufferCount];
+	ID3D11ShaderResourceView* depthShaderView;
 
 	ID3D11DepthStencilView* pDSV;
 

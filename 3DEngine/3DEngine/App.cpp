@@ -19,7 +19,7 @@ App::App( const std::string& commandLine )
 	wnd( 1280, 720, "The Donkey Fart Box" ),
 	scriptCommander( TokenizeQuoted( commandLine ) ),
 	dirLight( wnd.Gfx() ),
-	light( wnd.Gfx(), 10.0f )
+	light( wnd.Gfx(), 15.0f )
 {
 	wnd.Gfx().SetProjection( dx::XMMatrixPerspectiveLH( 1.0f,9.0f / 16.0f,0.5f,400.0f ) );
 
@@ -46,7 +46,7 @@ void App::DoFrame()
 
 	sponza.Draw( wnd.Gfx() );
 	dirLight.DrawDirLight( wnd.Gfx() );
-	light.DrawPointLight( wnd.Gfx() );
+	//light.DrawPointLight( wnd.Gfx() );
 
 	while ( const auto e = wnd.kbd.ReadKey() )
 	{

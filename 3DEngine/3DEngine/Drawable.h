@@ -34,7 +34,6 @@ public:
 	}
 protected:
 	void AddBind( std::shared_ptr<Bind::Bindable> bind ) noxnd;				// add drawable specific bind
-private:
 	const Bind::IndexBuffer* pIndexBuffer = nullptr;						// pointer to index buffer
 	std::vector<std::shared_ptr<Bind::Bindable>> binds;						// container of bindables
 };

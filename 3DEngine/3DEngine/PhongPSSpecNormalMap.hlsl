@@ -5,10 +5,9 @@ SamplerState splr;
 
 struct PSOut
 {
-    float4 position : SV_Target0;
-    float4 color : SV_Target1;
-    float4 normal : SV_Target2;
-    float4 specular : SV_Target3;
+    float4 color : SV_Target0;
+    float4 normal : SV_Target1;
+    float4 specular : SV_Target2;
 };
 
 PSOut main(float3 viewFragPos : Position, float3 viewNormal : Normal, float3 viewTan : Tangent, float3 viewBitan : Bitangent, float2 tc : Texcoord) : SV_Target
@@ -16,7 +15,6 @@ PSOut main(float3 viewFragPos : Position, float3 viewNormal : Normal, float3 vie
     PSOut output;
 
     // Sample the color from the texture and store it for output to the render target.
-    output.position = float4(viewFragPos, 1.0f);
     output.color = tex.Sample(splr, tc);
     output.specular = spec.Sample(splr, tc);
 

@@ -1,40 +1,55 @@
-Texture2D positionTexture : register(t0);
-Texture2D colorTexture : register(t1);
-Texture2D normalTexture : register(t2);
-Texture2D specularTexture : register(t3);
+Texture2D colorTexture : register(t0);
+Texture2D normalTexture : register(t1);
+Texture2D specularTexture : register(t2);
+Texture2D depthTexture : register(t3);
 
 SamplerState SampleTypePoint : register(s0);
 
 cbuffer CBuf : register(b1)
 {
     float4 color;
+    float4x4 mvpMatrix;
 };
 
+cbuffer CBuf : register(b2)
+{
+    float4 lightPosition;
+};
 
-float4 main(float4 position : SV_POSITION,float2 tex : Texcoord) : SV_TARGET
+float4 main(float4 position : SV_POSITION) : SV_TARGET
 {
     float2 screenPos;
     screenPos.x = position.x / 1280;
     screenPos.y = position.y / 720;
-    
-    // Sample the colors from the color render texture
+
     float4 colors = colorTexture.Sample(SampleTypePoint, screenPos);
-
-    // Sample the normals from the normal render texture
     float4 normals = normalTexture.Sample(SampleTypePoint, screenPos);
-
     float4 specular = specularTexture.Sample(SampleTypePoint, screenPos);
-    float4 positionSample = positionTexture.Sample(SampleTypePoint, screenPos);
 
-    float4 dirToL = position - positionSample;
-    // Invert the light direction for calculations.
-    //float3 lightDir = -lightDirection;
+    float depthSample = depthTexture.Sample(SampleTypePoint, screenPos);
+    float clipX = (screenPos.x - 1.0) * 2.0;
+    float clipY = (1 - screenPos.y) * 2.0;
     
-    // Calculate the amount of light on this pixel.
-    float lightIntensity = saturate(dot(normals.xyz, normalize(dirToL.xyz)));
     
-    // Determine the final amount of diffuse color based on the color of the pixel combined with the light intensity.
-    float4 outputColor = saturate(colors * normalize(lightIntensity) * specular.w);
+    float4 worldDepth = float4(clipX, clipY, depthSample, 1.0);
+    float4 viewSpacePosition = mul(worldDepth, mvpMatrix);
+    viewSpacePosition /= viewSpacePosition.w;
+    
+    float3 vToL = lightPosition - depthSample;
+    float len = length(vToL);
+    float lightIntensity = saturate(dot(normalize(normals.xyz), normalize(vToL.xyz)));
+    
+    //float4 outputColor = saturate(color * colors * specular.w);
+    //return sampledPosition;
 
-    return colors;
+    if (len > 30)
+    {
+        float4 outputColor = saturate( colors * specular.w);
+        return outputColor * lightIntensity;
+    }
+    else
+    {
+        float4 outputColor = saturate(color * colors * specular.w);
+        return outputColor * lightIntensity;
+    }
 }

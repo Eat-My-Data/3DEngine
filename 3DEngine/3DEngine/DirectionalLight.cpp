@@ -18,13 +18,28 @@ DirectionalLight::DirectionalLight( Graphics& gfx )
 	AddBind( PixelShader::Resolve( gfx, "LightPS.cso" ) );\
 	AddBind( Sampler::Resolve( gfx ) );
 
-	// Create the constant buffer pointer so we can access the pixel shader constant buffer from within this class.
 	struct LightBufferType
 	{
-		DirectX::XMFLOAT3 lightDirection = { 0.0f, 1.0f, 0.0f };
+		DirectX::XMFLOAT3 lightDirection = { 0.0f, -1.0f, -1.0f };
 		float padding;
+		DirectX::XMMATRIX mvpMatrix;
+		//DirectX::XMFLOAT3 camPos;
+		//float padding2;
 	} lbuf;
+
+
+	DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant( gfx.GetCamera() );
+	DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixInverse( &determinant, gfx.GetCamera() );
+	lbuf.mvpMatrix = gfx.GetCamera() * gfx.GetProjection();
+	DirectX::XMVECTOR determinant2 = DirectX::XMMatrixDeterminant( lbuf.mvpMatrix );
+	DirectX::XMMATRIX viewMatrix2 = DirectX::XMMatrixInverse( &determinant2, lbuf.mvpMatrix );
+	DirectX::XMMatrixTranspose( lbuf.mvpMatrix );
+
 	AddBind( PixelConstantBuffer<LightBufferType>::Resolve( gfx,lbuf,0u ) );
+	pcs = PixelConstantBuffer<CamPosBuffer>::Resolve( gfx, cambuf, 1u );
+	AddBind( pcs );
+
+
 	AddBind( Blender::Resolve( gfx, false ) );
 
 	AddBind( Topology::Resolve( gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
@@ -52,3 +67,28 @@ DirectX::XMMATRIX DirectionalLight::GetTransformXM() const noexcept
 	return DirectX::XMMatrixTranslation( 1.0f, 1.0f, 1.0f );
 }
 
+void DirectionalLight::DrawDirLight( Graphics& gfx )
+{
+	gfx.GetContext()->IASetVertexBuffers( 0, 0, NULL, NULL, NULL );
+	gfx.GetContext()->IASetIndexBuffer( NULL, (DXGI_FORMAT)0, 0 );
+	gfx.GetContext()->IASetInputLayout( NULL );
+	const float color[] = { 0.07f,0.0f,0.12f };
+	gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetLightBuffer(), NULL );
+	gfx.GetContext()->PSSetShaderResources( 0, 3, gfx.GetShaderResources() );
+	gfx.GetContext()->PSSetShaderResources( 3, 1, gfx.GetDepthResource() );
+
+	cambuf.camPos.x = gfx.GetCamera().r[3].m128_f32[0];
+	cambuf.camPos.y = gfx.GetCamera().r[3].m128_f32[1];
+	cambuf.camPos.z = gfx.GetCamera().r[3].m128_f32[2];
+	pcs->Update( gfx, cambuf );
+
+	for ( auto& b : binds )
+	{
+		b->Bind( gfx );
+	}
+
+	gfx.GetContext()->Draw( 3, 0 );
+
+	ID3D11ShaderResourceView* null[] = { nullptr, nullptr, nullptr, nullptr };
+	gfx.GetContext()->PSSetShaderResources( 0, 4, null );
+}

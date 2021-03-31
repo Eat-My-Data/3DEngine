@@ -11,5 +11,4 @@ public:
 private:
 	//DirectX::XMFLOAT3 lightDirection;
 	ID3D11Buffer* m_lightBuffer;
-	DirectX::XMFLOAT3 pos = { 1.0f,1.0f,1.0f };
 };

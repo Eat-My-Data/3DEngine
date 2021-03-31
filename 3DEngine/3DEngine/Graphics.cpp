@@ -134,11 +134,11 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	descDepth.Height = height;
 	descDepth.MipLevels = 1u;
 	descDepth.ArraySize = 1u;
-	descDepth.Format = DXGI_FORMAT_D32_FLOAT;
+	descDepth.Format = DXGI_FORMAT_R32_TYPELESS;
 	descDepth.SampleDesc.Count = 1u;
 	descDepth.SampleDesc.Quality = 0u;
 	descDepth.Usage = D3D11_USAGE_DEFAULT;
-	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 	GFX_THROW_INFO( pDevice->CreateTexture2D( &descDepth,nullptr,&pDepthStencil ) );
 
 	// create view of depth stenstil texture
@@ -149,6 +149,18 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	GFX_THROW_INFO( pDevice->CreateDepthStencilView(
 		pDepthStencil.Get(),&descDSV,&pDSV
 	) );
+
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC depthShaderResourceDesc = {};
+	depthShaderResourceDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	depthShaderResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	depthShaderResourceDesc.Texture2D.MostDetailedMip = 0;
+	depthShaderResourceDesc.Texture2D.MipLevels = 1;
+	HRESULT hr2 = pDevice->CreateShaderResourceView( pDepthStencil.Get(), &depthShaderResourceDesc, &depthShaderView );
+	if ( FAILED(hr2) )
+	{
+		throw HrException( __LINE__, __FILE__, hr );
+	}
 
 	// configure viewport
 	D3D11_VIEWPORT vp;
