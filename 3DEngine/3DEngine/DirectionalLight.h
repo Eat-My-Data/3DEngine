@@ -10,7 +10,6 @@ public:
 	void SpawnControlWindow( Graphics& gfx ) noexcept;
 	void DrawDirLight( Graphics& gfx );
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
-	void Update( Graphics& gfx );
 private:
 	struct CamPosBuffer
 	{
@@ -18,7 +17,15 @@ private:
 		float padding2;
 	} cambuf;
 	std::shared_ptr<Bind::PixelConstantBuffer<CamPosBuffer>> pcs;
-
+	struct LightBufferType
+	{
+		DirectX::XMFLOAT3 lightDirection = { 0.0f, -1.0f, -1.0f };
+		float padding;
+		DirectX::XMMATRIX mvpMatrix;
+		//DirectX::XMFLOAT3 camPos;
+		//float padding2;
+	} lbuf;
+	std::shared_ptr<Bind::PixelConstantBuffer<LightBufferType>> pcs2;
 	//DirectX::XMFLOAT3 lightDirection;
 	ID3D11Buffer* m_lightBuffer;
 };

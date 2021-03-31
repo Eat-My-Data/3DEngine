@@ -48,7 +48,7 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     
     float3 camToFrag = worldPosition.xyz - camPos;
     
-    float3 specularResult = Speculate(specular.xyz, 1, normals.xyz, -lightDirection, camToFrag, 1, 128);
+    float3 specularResult = Speculate(specular.xyz, 1, normals.xyz, -lightDirection, camToFrag, .5, 64);
     
     //return float4(specularResult, 1.0f);
     // Determine the final amount of diffuse color based on the color of the pixel combined with the light intensity.
