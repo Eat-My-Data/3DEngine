@@ -24,7 +24,7 @@ DirectionalLight::DirectionalLight( Graphics& gfx )
 	lbuf.mvpMatrix = gfx.GetCamera() * gfx.GetProjection();
 	DirectX::XMVECTOR determinant2 = DirectX::XMMatrixDeterminant( lbuf.mvpMatrix );
 	DirectX::XMMATRIX viewMatrix2 = DirectX::XMMatrixInverse( &determinant2, lbuf.mvpMatrix );
-	DirectX::XMMatrixTranspose( lbuf.mvpMatrix );
+	lbuf.mvpMatrix = DirectX::XMMatrixTranspose( viewMatrix2 );
 
 	pcs2 = PixelConstantBuffer<LightBufferType>::Resolve( gfx, lbuf, 0u );
 	AddBind( pcs2 );
@@ -79,7 +79,7 @@ void DirectionalLight::DrawDirLight( Graphics& gfx )
 	lbuf.mvpMatrix = gfx.GetCamera() * gfx.GetProjection();
 	DirectX::XMVECTOR determinant2 = DirectX::XMMatrixDeterminant( lbuf.mvpMatrix );
 	DirectX::XMMATRIX viewMatrix2 = DirectX::XMMatrixInverse( &determinant2, lbuf.mvpMatrix );
-	DirectX::XMMatrixTranspose( lbuf.mvpMatrix );
+	lbuf.mvpMatrix = DirectX::XMMatrixTranspose( viewMatrix2 );
 	pcs2->Update( gfx, lbuf );
 
 	for ( auto& b : binds )
