@@ -83,6 +83,8 @@ public:
 	ID3D11ShaderResourceView* GetNormalResource() { return pShaderView[1]; }
 	ID3D11ShaderResourceView** GetShaderResources() { return pShaderView; }
 	ID3D11ShaderResourceView** GetDepthResource() { return &depthShaderView; }
+
+	ID3D11BlendState* GetBlendState() { return blendState; }
 private:
 	DirectX::XMMATRIX projection;									// projection matrix
 	DirectX::XMMATRIX camera;										// camera matrix
@@ -103,6 +105,9 @@ private:
 	ID3D11DepthStencilView* pDSV;
 
 	ID3D11RenderTargetView* lightBuffer;
+
+	ID3D11BlendState* blendState;
+
 	// used in for compute shader
 	Microsoft::WRL::ComPtr<ID3D11Resource> pBackBuffer;
 	//Microsoft::WRL::ComPtr<ID3D11Texture2D> pMyTargetTexture;

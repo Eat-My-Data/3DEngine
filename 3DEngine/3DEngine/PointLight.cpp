@@ -24,28 +24,21 @@ PointLight::PointLight( Graphics& gfx, float radius )
 	AddBind( Sampler::Resolve( gfx ) );
 
 
-
-	struct PSColorConstant
-	{
-		dx::XMFLOAT3 color = { 0.0f,0.0f,1.0f };
-		float padding;
-		DirectX::XMMATRIX mvpMatrix;
-	} colorConst;
-
 	DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant( gfx.GetCamera() );
 	DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixInverse( &determinant, gfx.GetCamera() );
-	colorConst.mvpMatrix = gfx.GetCamera() * gfx.GetProjection();
+	colorConst.mvpMatrix = viewMatrix * gfx.GetProjection();
 	DirectX::XMVECTOR determinant2 = DirectX::XMMatrixDeterminant( colorConst.mvpMatrix );
 	DirectX::XMMATRIX viewMatrix2 = DirectX::XMMatrixInverse( &determinant2, colorConst.mvpMatrix );
-	DirectX::XMMatrixTranspose( colorConst.mvpMatrix );
+	colorConst.mvpMatrix = DirectX::XMMatrixTranspose( viewMatrix2 );
 
-	struct PSPositionConstant
-	{
-		dx::XMFLOAT3 lightPosition = { 0.0f,0.0f,15.0f };
-		float padding;
-	} posConst;
-	AddBind( PixelConstantBuffer<PSColorConstant>::Resolve( gfx, colorConst, 1u ) );
-	AddBind( PixelConstantBuffer<PSPositionConstant>::Resolve( gfx, posConst, 2u ) );
+	pcs = PixelConstantBuffer<PSColorConstant>::Resolve( gfx, colorConst, 0u );
+	AddBind(  pcs );
+
+	pcs2 = PixelConstantBuffer<PSPositionConstant>::Resolve( gfx, posConst, 1u );
+	AddBind( pcs2 );
+
+	pcs3 = PixelConstantBuffer<CamPosBuffer>::Resolve( gfx, cambuf, 2u );
+	AddBind( pcs3 );
 
 	Dvtx::VertexBuffer vbuf( std::move(
 		Dvtx::VertexLayout{}
@@ -65,5 +58,44 @@ void PointLight::SetDirection( DirectX::XMFLOAT3 pos ) noexcept
 
 DirectX::XMMATRIX PointLight::GetTransformXM() const noexcept
 {
-	return DirectX::XMMatrixTranslation( 1.0f, 1.0f, 1.0f );
+	return DirectX::XMMatrixTranslation( posConst.lightPosition.x, posConst.lightPosition.y, posConst.lightPosition.z );
+}
+
+void PointLight::DrawPointLight( Graphics& gfx )
+{
+	gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetLightBuffer(), NULL );
+	gfx.GetContext()->PSSetShaderResources( 0, 3, gfx.GetShaderResources() );
+	gfx.GetContext()->PSSetShaderResources( 3, 1, gfx.GetDepthResource() );
+
+	DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant( gfx.GetCamera() );
+	DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixInverse( &determinant, gfx.GetCamera() );
+	colorConst.mvpMatrix = viewMatrix * gfx.GetProjection();
+	DirectX::XMVECTOR determinant2 = DirectX::XMMatrixDeterminant( colorConst.mvpMatrix );
+	DirectX::XMMATRIX viewMatrix2 = DirectX::XMMatrixInverse( &determinant2, colorConst.mvpMatrix );
+	colorConst.mvpMatrix = DirectX::XMMatrixTranspose( viewMatrix2 );
+	pcs->Update( gfx, colorConst );
+
+	pcs2->Update( gfx, posConst );
+
+	cambuf.camPos.x = gfx.GetCamera().r[3].m128_f32[0];
+	cambuf.camPos.y = gfx.GetCamera().r[3].m128_f32[1];
+	cambuf.camPos.z = gfx.GetCamera().r[3].m128_f32[2];
+	pcs3->Update( gfx, cambuf );
+
+	for ( auto& b : binds )
+	{
+		b->Bind( gfx );
+	}
+
+	gfx.DrawIndexed( pIndexBuffer->GetCount() );
+
+	ID3D11ShaderResourceView* null[] = { nullptr, nullptr, nullptr, nullptr };
+	gfx.GetContext()->PSSetShaderResources( 0, 4, null );
+}
+
+void PointLight::SetPos( DirectX::XMFLOAT3 vec )
+{
+	posConst.lightPosition.x  +=  vec.x;
+	posConst.lightPosition.y += vec.y;
+	posConst.lightPosition.z += vec.z;
 }

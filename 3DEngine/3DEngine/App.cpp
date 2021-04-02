@@ -46,7 +46,7 @@ void App::DoFrame()
 
 	sponza.Draw( wnd.Gfx() );
 	dirLight.DrawDirLight( wnd.Gfx() );
-	//light.DrawPointLight( wnd.Gfx() );
+	light.DrawPointLight( wnd.Gfx() );
 
 	while ( const auto e = wnd.kbd.ReadKey() )
 	{
@@ -115,6 +115,22 @@ void App::DoFrame()
 		if ( wnd.kbd.KeyIsPressed( 'F' ) )
 		{
 			cam.Translate( { 0.0f,-dt,0.0f } );
+		}
+		if ( wnd.kbd.KeyIsPressed( 'I' ) )
+		{
+			light.SetPos( DirectX::XMFLOAT3( -1.0, 0.0, 0.0 ) );
+		}
+		if ( wnd.kbd.KeyIsPressed( 'K' ) )
+		{
+			light.SetPos( DirectX::XMFLOAT3( 1.0, 0.0, 0.0 ) );
+		}
+		if ( wnd.kbd.KeyIsPressed( 'J' ) )
+		{
+			light.SetPos( DirectX::XMFLOAT3( 0.0, 0.0, 1.0 ) );
+		}
+		if ( wnd.kbd.KeyIsPressed( 'L' ) )
+		{
+			light.SetPos( DirectX::XMFLOAT3( 0.0, 0.0, -1.0 ) );
 		}
 	}
 

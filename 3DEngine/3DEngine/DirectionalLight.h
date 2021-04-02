@@ -17,6 +17,7 @@ private:
 		float padding2;
 	} cambuf;
 	std::shared_ptr<Bind::PixelConstantBuffer<CamPosBuffer>> pcs;
+#if 1
 	struct LightBufferType
 	{
 		DirectX::XMFLOAT3 lightDirection = { 0.0f, -1.0f, -1.0f };
@@ -25,6 +26,17 @@ private:
 		//DirectX::XMFLOAT3 camPos;
 		//float padding2;
 	} lbuf;
+#else
+	struct LightBufferType
+	{
+		DirectX::XMFLOAT3 lightDirection = { 0.0f, -1.0f, -1.0f };
+		float padding;
+		DirectX::XMMATRIX projMatrixInv;
+		DirectX::XMMATRIX viewMatrixInv;
+		//DirectX::XMFLOAT3 camPos;
+		//float padding2;
+	} lbuf;
+#endif
 	std::shared_ptr<Bind::PixelConstantBuffer<LightBufferType>> pcs2;
 	//DirectX::XMFLOAT3 lightDirection;
 	ID3D11Buffer* m_lightBuffer;
