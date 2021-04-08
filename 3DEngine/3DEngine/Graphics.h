@@ -113,4 +113,7 @@ private:
 	//Microsoft::WRL::ComPtr<ID3D11Texture2D> pMyTargetTexture;
 	//Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pMyTarget;
 
+public:
+	ID3D11RasterizerState* rasterizerDR;
+
 };

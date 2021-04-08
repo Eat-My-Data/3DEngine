@@ -52,11 +52,8 @@ float4 main(float4 position : SV_POSITION) : SV_TARGET
     
     float3 camToFrag = worldPosition.xyz - camPos;
     
-    //float4 outputColor = saturate(color * colors * specular.w);
-    //return sampledPosition;
     float3 specularResult = Speculate(specular.xyz, 1, normals.xyz, vToL, camToFrag, .5, 128);
     
-    //return colors;
     if (len > 15)
     {
         return float4(0, 0, 0, 0);
@@ -64,7 +61,6 @@ float4 main(float4 position : SV_POSITION) : SV_TARGET
     }
     else
     {
-        float4 outputColor = saturate(colors);
         return color * colors * diffuseIntensity + float4(specularResult, 1.0f);
     }
 }

@@ -10,6 +10,6 @@ VSOut main(float3 viewFragPos : Position)
     VSOut output;
     
     output.position = mul(float4(viewFragPos, 1.0f), modelViewProj);
-
+    //output.position = float4(viewFragPos, 1.0f);
     return output;
 }

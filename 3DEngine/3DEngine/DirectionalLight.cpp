@@ -40,9 +40,6 @@ DirectionalLight::DirectionalLight( Graphics& gfx )
 	pcs = PixelConstantBuffer<CamPosBuffer>::Resolve( gfx, cambuf, 1u );
 	AddBind( pcs );
 
-
-	AddBind( Blender::Resolve( gfx, false ) );
-
 	AddBind( Topology::Resolve( gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
 
 	AddBind( Rasterizer::Resolve( gfx, true ) );
@@ -72,8 +69,9 @@ void DirectionalLight::DrawDirLight( Graphics& gfx )
 {
 	gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetLightBuffer(), NULL );
 
+	gfx.GetContext()->RSSetState( gfx.rasterizerDR );
 	const float blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
-	gfx.GetContext()->OMSetBlendState( gfx.GetBlendState(), blendFactor, 0xffffffff );
+	gfx.GetContext()->OMSetBlendState( gfx.GetBlendState(), blendFactor, 0xFFFFFFFF );
 
 	gfx.GetContext()->PSSetShaderResources( 0, 3, gfx.GetShaderResources() );
 	gfx.GetContext()->PSSetShaderResources( 3, 1, gfx.GetDepthResource() );

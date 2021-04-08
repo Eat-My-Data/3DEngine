@@ -7,6 +7,10 @@ using namespace Bind;
 
 void Drawable::Draw( Graphics& gfx ) const noxnd
 {
+	gfx.GetContext()->RSSetState( NULL );
+	const float blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
+	gfx.GetContext()->OMSetBlendState( NULL, blendFactor, 0xFFFFFFFF );
+
 	for( auto& b : binds )
 	{
 		b->Bind( gfx );

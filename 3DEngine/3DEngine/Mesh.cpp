@@ -727,7 +727,7 @@ std::unique_ptr<Mesh> Model::ParseMesh( Graphics& gfx,const aiMesh& mesh,const a
 
 
 
-	bindablePtrs.push_back( Blender::Resolve( gfx,false ) );
+	//bindablePtrs.push_back( Blender::Resolve( gfx,false ) );
 
 	return std::make_unique<Mesh>( gfx,std::move( bindablePtrs ) );
 }

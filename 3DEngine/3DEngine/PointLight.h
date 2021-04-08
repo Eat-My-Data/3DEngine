@@ -9,7 +9,7 @@ public:
 	void SetDirection( DirectX::XMFLOAT3 direction ) noexcept;
 	void SpawnControlWindow( Graphics& gfx ) noexcept;
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
-	void DrawPointLight( Graphics& gfx );
+	void DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view );
 	void SetPos( DirectX::XMFLOAT3 vec );
 private:
 	//DirectX::XMFLOAT3 lightDirection;
@@ -24,7 +24,7 @@ private:
 
 	struct PSPositionConstant
 	{
-		DirectX::XMFLOAT3 lightPosition = { -15.0f,0.0f,15.0f };
+		DirectX::XMFLOAT3 lightPosition = { 1.0f,1.0f,1.0f };
 		float padding;
 	} posConst;
 	std::shared_ptr<Bind::PixelConstantBuffer<PSPositionConstant>> pcs2;

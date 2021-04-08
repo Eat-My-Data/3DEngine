@@ -48,6 +48,8 @@ PointLight::PointLight( Graphics& gfx, float radius )
 
 	AddBind( Topology::Resolve( gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
 
+	AddBind( std::make_shared<TransformCbuf>( gfx, *this ) );
+
 	AddBind( Rasterizer::Resolve( gfx, false ) );
 }
 
@@ -61,7 +63,7 @@ DirectX::XMMATRIX PointLight::GetTransformXM() const noexcept
 	return DirectX::XMMatrixTranslation( posConst.lightPosition.x, posConst.lightPosition.y, posConst.lightPosition.z );
 }
 
-void PointLight::DrawPointLight( Graphics& gfx )
+void PointLight::DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view )
 {
 	gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetLightBuffer(), NULL );
 	gfx.GetContext()->PSSetShaderResources( 0, 3, gfx.GetShaderResources() );
@@ -75,7 +77,13 @@ void PointLight::DrawPointLight( Graphics& gfx )
 	colorConst.mvpMatrix = DirectX::XMMatrixTranspose( viewMatrix2 );
 	pcs->Update( gfx, colorConst );
 
-	pcs2->Update( gfx, posConst );
+	auto dataCopy = posConst;
+	float temp = dataCopy.lightPosition.x;
+	dataCopy.lightPosition.x = dataCopy.lightPosition.z;
+	dataCopy.lightPosition.z = temp;
+	const auto pos = DirectX::XMLoadFloat3( &dataCopy.lightPosition );
+	DirectX::XMStoreFloat3( &dataCopy.lightPosition, DirectX::XMVector3Transform( pos, view ) );
+	pcs2->Update( gfx, dataCopy );
 
 	cambuf.camPos.x = gfx.GetCamera().r[3].m128_f32[0];
 	cambuf.camPos.y = gfx.GetCamera().r[3].m128_f32[1];
@@ -95,7 +103,7 @@ void PointLight::DrawPointLight( Graphics& gfx )
 
 void PointLight::SetPos( DirectX::XMFLOAT3 vec )
 {
-	posConst.lightPosition.x  +=  vec.x;
+	posConst.lightPosition.x += vec.x;
 	posConst.lightPosition.y += vec.y;
 	posConst.lightPosition.z += vec.z;
 }

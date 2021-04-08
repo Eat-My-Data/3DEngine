@@ -51,6 +51,7 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     clipX = -clipX;
    
     normals = (normals * 2.0) - 1.0;    
+    
 #if 1
     float4 worldDepth = float4(clipX, clipY, 2.0 * depthSample - 1.0, 1.0);
     float4 worldPosition = mul(worldDepth, mvpMatrix);
@@ -72,10 +73,6 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     float3 camToFrag = worldSpacePosition.xyz - camPos;
 #endif
     float3 specularResult = Speculate(specular.xyz, 1, normals.xyz, -lightDirection, camToFrag, .5, 128);
-    
-    //return float4(specularResult, 1.0f);
-    // Determine the final amount of diffuse color based on the color of the pixel combined with the light intensity.
-    float4 outputColor = saturate(colors);
 
     return colors * diffuseIntensity + float4(specularResult,1.0f);
 }

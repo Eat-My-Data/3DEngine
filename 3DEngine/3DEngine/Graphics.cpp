@@ -116,20 +116,31 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 		}
 	}
 
-	D3D11_BLEND_DESC desc;
-	ZeroMemory( &desc, sizeof( desc ) );
-	desc.AlphaToCoverageEnable = false;
-	desc.RenderTarget[0].BlendEnable = true;
-	desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-	desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-	desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
-	desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-	desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-	desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	//Setup blend state 
+	D3D11_BLEND_DESC blendDescDR;
+	ZeroMemory( &blendDescDR, sizeof( blendDescDR ) );
+	blendDescDR.AlphaToCoverageEnable = false;
+	blendDescDR.IndependentBlendEnable = false;
+	blendDescDR.RenderTarget[0].BlendEnable = true;
+	blendDescDR.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	blendDescDR.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blendDescDR.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDescDR.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDescDR.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	blendDescDR.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDescDR.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-	pDevice->CreateBlendState( &desc, &blendState );
+	pDevice->CreateBlendState( &blendDescDR, &blendState );
 
+
+	//Setup rasterizer state 
+	D3D11_RASTERIZER_DESC rasterizerDescDR;
+	ZeroMemory( &rasterizerDescDR, sizeof( rasterizerDescDR ) );
+	rasterizerDescDR.CullMode = D3D11_CULL_BACK;
+	rasterizerDescDR.FillMode = D3D11_FILL_SOLID;
+	rasterizerDescDR.DepthClipEnable = false;
+
+	pDevice->CreateRasterizerState( &rasterizerDescDR, &rasterizerDR );
 
 	// create depth stensil descriptor
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
@@ -232,6 +243,9 @@ void Graphics::BeginFrame( float red,float green,float blue ) noexcept
 	{
 		pContext->ClearRenderTargetView( pTarget[i], color );
 	}
+	float val[4] = { 0, 0, 0, 0 };
+	pContext->ClearRenderTargetView( lightBuffer, val );
+
 	pContext->ClearDepthStencilView( pDSV,D3D11_CLEAR_DEPTH,1.0f,0u );
 }
 

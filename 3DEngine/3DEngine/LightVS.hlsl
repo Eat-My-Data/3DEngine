@@ -1,5 +1,3 @@
-#include "Transform.hlsl"
-
 struct VSOut
 {
     float4 position : SV_POSITION;
