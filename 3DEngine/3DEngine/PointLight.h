@@ -9,7 +9,7 @@ public:
 	void SetDirection( DirectX::XMFLOAT3 direction ) noexcept;
 	void SpawnControlWindow( Graphics& gfx ) noexcept;
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
-	void DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view );
+	void DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view, DirectX::XMFLOAT3 camPos );
 	void SetPos( DirectX::XMFLOAT3 vec );
 private:
 	//DirectX::XMFLOAT3 lightDirection;
@@ -33,6 +33,7 @@ private:
 	{
 		DirectX::XMFLOAT3 camPos;
 		float padding2;
+		//DirectX::XMMATRIX camMatrix;
 	} cambuf;
 	std::shared_ptr<Bind::PixelConstantBuffer<CamPosBuffer>> pcs3;
 };

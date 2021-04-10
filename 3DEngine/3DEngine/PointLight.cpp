@@ -63,7 +63,7 @@ DirectX::XMMATRIX PointLight::GetTransformXM() const noexcept
 	return DirectX::XMMatrixTranslation( posConst.lightPosition.x, posConst.lightPosition.y, posConst.lightPosition.z );
 }
 
-void PointLight::DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view )
+void PointLight::DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view,DirectX::XMFLOAT3 camPos )
 {
 	gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetLightBuffer(), NULL );
 	gfx.GetContext()->PSSetShaderResources( 0, 3, gfx.GetShaderResources() );
@@ -82,12 +82,10 @@ void PointLight::DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view )
 	dataCopy.lightPosition.x = dataCopy.lightPosition.z;
 	dataCopy.lightPosition.z = temp;
 	const auto pos = DirectX::XMLoadFloat3( &dataCopy.lightPosition );
-	DirectX::XMStoreFloat3( &dataCopy.lightPosition, DirectX::XMVector3Transform( pos, view ) );
+	DirectX::XMStoreFloat3( &dataCopy.lightPosition, DirectX::XMVector3Transform( pos, view * gfx.GetProjection() ) );
 	pcs2->Update( gfx, dataCopy );
 
-	cambuf.camPos.x = gfx.GetCamera().r[3].m128_f32[0];
-	cambuf.camPos.y = gfx.GetCamera().r[3].m128_f32[1];
-	cambuf.camPos.z = gfx.GetCamera().r[3].m128_f32[2];
+	cambuf.camPos = camPos;
 	pcs3->Update( gfx, cambuf );
 
 	for ( auto& b : binds )

@@ -8,7 +8,7 @@ public:
 	DirectionalLight( Graphics& gfx );
 	void SetDirection( DirectX::XMFLOAT3 direction ) noexcept;
 	void SpawnControlWindow( Graphics& gfx ) noexcept;
-	void DrawDirLight( Graphics& gfx );
+	void DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos );
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
 private:
 	struct CamPosBuffer

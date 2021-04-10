@@ -13,8 +13,6 @@ cbuffer LightBuffer : register(b0)
     float3 lightDirection;
     float padding;
     float4x4 mvpMatrix;
-    //float3 camPos;
-    //float padding2;
 };
 #else
 cbuffer LightBuffer : register(b0)
@@ -53,7 +51,7 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     normals = (normals * 2.0) - 1.0;    
     
 #if 1
-    float4 worldDepth = float4(clipX, clipY, 2.0 * depthSample - 1.0, 1.0);
+    float4 worldDepth = float4(clipX, clipY, depthSample, 1.0);
     float4 worldPosition = mul(worldDepth, mvpMatrix);
     worldPosition /= worldPosition.w;
 

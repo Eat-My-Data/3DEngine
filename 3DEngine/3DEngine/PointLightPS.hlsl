@@ -9,26 +9,28 @@ SamplerState SampleTypePoint : register(s0);
 
 cbuffer CBuf : register(b0)
 {
-    float4 color;
+    float3 color;
+    float padding;
     float4x4 mvpMatrix;
 };
 
 cbuffer CBuf : register(b1)
 {
-    float4 lightPosition;
+    float3 lightPosition;
+    float padding2;
 };
 
 cbuffer CamPosBuffer : register(b2)
 {
     float3 camPos;
-    float padding2;
+    float padding3;
 };
 
 float4 main(float4 position : SV_POSITION) : SV_TARGET
 {
     float2 screenPos;
-    screenPos.x = position.x / 1280;
-    screenPos.y = position.y / 720;
+    screenPos.x = position.x / 1280.0f;
+    screenPos.y = position.y / 720.0f;
 
     float4 colors = colorTexture.Sample(SampleTypePoint, screenPos);
     float4 normals = normalTexture.Sample(SampleTypePoint, screenPos);
@@ -41,7 +43,11 @@ float4 main(float4 position : SV_POSITION) : SV_TARGET
     clipX = -clipX;
    
     normals = (normals * 2.0) - 1.0;
-
+    
+    //float4 lightPos = mul(float4(lightPosition, 1), camMatrix);
+    //lightPos /= lightPos.w;
+    
+    //float4 worldDepth = float4(clipX, clipY, (2 * depthSample) - 1, 1.0);
     float4 worldDepth = float4(clipX, clipY, depthSample, 1.0);
     float4 worldPosition = mul(worldDepth, mvpMatrix);
     worldPosition /= worldPosition.w;
@@ -61,6 +67,6 @@ float4 main(float4 position : SV_POSITION) : SV_TARGET
     }
     else
     {
-        return color * colors * diffuseIntensity + float4(specularResult, 1.0f);
+        return float4(color, 1) * colors * diffuseIntensity + float4(specularResult, 1.0f);
     }
 }
