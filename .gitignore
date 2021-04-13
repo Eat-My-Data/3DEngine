@@ -69,6 +69,7 @@ StyleCopReport.xml
 !3DEngine/3DEngine/Models/*.obj
 !3DEngine/3DEngine/Models/**/*.obj
 !3DEngine/3DEngine/assimp/*
+!3DEngine/3DEngine/dxtex/*
 *.iobj
 *.pch
 *.pdb

@@ -11,7 +11,7 @@ cbuffer CBuf : register(b0)
 {
     float3 color;
     float padding;
-    row_major float4x4 cameraMatrix;
+    float4x4 cameraMatrix;
     row_major float4x4 projInvMatrix;
 };
 
