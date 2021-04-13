@@ -13,6 +13,7 @@ cbuffer LightBuffer : register(b0)
     float3 lightDirection;
     float padding;
     float4x4 mvpMatrix;
+    float4x4 viewInvMatrix;
 };
 #else
 cbuffer LightBuffer : register(b0)
@@ -35,30 +36,31 @@ cbuffer CamPosBuffer : register(b1)
 
 float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
 {
-    // Sample the colors from the color render texture
-    float4 colors = colorTexture.Load(int3(position.xy,0));
+    float4 colors = colorTexture.Load(int3(position.xy, 0));
     
-    // Sample the normals from the normal render texture
     float4 normals = normalTexture.Sample(SampleTypePoint, tex);
     float4 specular = specularTexture.Sample(SampleTypePoint, tex);
     
-    float depthSample = depthTexture.Sample(SampleTypePoint, tex).r;
+    float depthSample = (depthTexture.Sample(SampleTypePoint, tex).r * 2.0) - 1.0;
     float clipX = (tex.x * 2.0) - 1.0;
     float clipY = (tex.y * 2.0) - 1.0;
     clipY = -clipY;
     clipX = -clipX;
-   
-    normals = (normals * 2.0) - 1.0;    
+    
+    normals = (normals * 2.0) - 1.0;
     
 #if 1
     float4 worldDepth = float4(clipX, clipY, depthSample, 1.0);
     float4 worldPosition = mul(worldDepth, mvpMatrix);
     worldPosition /= worldPosition.w;
-
-    // Calculate the amount of light on this pixel.
-    float diffuseIntensity = saturate(dot(normalize(normals.xyz), normalize(-lightDirection.xyz)));
     
-    float3 camToFrag = worldPosition.xyz - camPos;
+    //float4 worldSpacePos = mul(worldPosition, viewInvMatrix);
+    
+    //float4 camSpaceDepth = mul(float4(camPos, 1), mvpMatrix);
+    //camSpaceDepth /= camSpaceDepth.w;
+    //float4 camSpacePos = mul(camSpaceDepth, viewInvMatrix);
+
+    float3 camToFrag = worldPosition.xyz - camPos.xyz;
 #else
     float4 viewDepth = float4(clipX, clipY, depthSample, 1.0);
     float4 viewPosition = mul(projMatrixInv, viewDepth);
@@ -70,6 +72,8 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     
     float3 camToFrag = worldSpacePosition.xyz - camPos;
 #endif
+    float diffuseIntensity = saturate(dot(normalize(normals.xyz), normalize(-lightDirection.xyz)));
+
     float3 specularResult = Speculate(specular.xyz, 1, normals.xyz, -lightDirection, camToFrag, .5, 128);
 
     return colors * diffuseIntensity + float4(specularResult,1.0f);

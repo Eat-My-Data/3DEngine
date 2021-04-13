@@ -18,7 +18,9 @@ private:
 	{
 		DirectX::XMFLOAT3 color = { 1.0f,1.0f,1.0f };
 		float padding;
-		DirectX::XMMATRIX mvpMatrix;
+		DirectX::XMMATRIX cameraMatrix;
+		DirectX::XMMATRIX projInvMatrix;
+		//DirectX::XMMATRIX viewMatrix;
 	} colorConst;
 	std::shared_ptr<Bind::PixelConstantBuffer<PSColorConstant>> pcs;
 
