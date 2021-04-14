@@ -74,7 +74,7 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
 #endif
     float diffuseIntensity = saturate(dot(normalize(normals.xyz), normalize(-lightDirection.xyz)));
 
-    float3 specularResult = Speculate(specular.xyz, 1, normals.xyz, -lightDirection, camToFrag, .5, 128);
+    float3 specularResult = Speculate(specular.xyz, 1, normalize(normals.xyz), normalize(-lightDirection), camToFrag, .5, 128);
 
     return colors * diffuseIntensity + float4(specularResult,1.0f);
 }
