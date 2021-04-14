@@ -1,4 +1,5 @@
 #include "ShaderOps.hlsl"
+#include "LightVectorData.hlsl"
 
 Texture2D colorTexture : register(t0);
 Texture2D normalTexture : register(t1);
@@ -11,7 +12,7 @@ cbuffer CBuf : register(b0)
 {
     float3 color;
     float padding;
-    float4x4 cameraMatrix;
+    row_major float4x4 cameraMatrix;
     row_major float4x4 projInvMatrix;
 };
 
@@ -54,22 +55,29 @@ float4 main(float4 position : SV_POSITION) : SV_TARGET
     
     //float4 newLight = mul(float4(lightPosition, 1), mvpMatrix);
     float4 worldSpacePos = mul(worldPosition, cameraMatrix);
+    const LightVectorData lv = CalculateLightVectorData(lightPosition, worldSpacePos.xyz);
     
-    float3 vToL = lightPosition.xyz - worldSpacePos.xyz;
-    float len = length(vToL);
-    float diffuseIntensity = saturate(dot(normalize(normals.xyz), normalize(vToL.xyz)));
+    //float3 vToL = lightPosition.xyz - worldSpacePos.xyz;
+    //float len = length(vToL);
+    
+    if ( lv.distToL > 15 )
+    {
+        return float4(0, 0, 0, 0);
+    }
+    
+    float attConst = 0.0f;
+    float attLin = 0.045f;
+    float attQuad = 0.0075f;
+    float att = Attenuate(attConst, attLin, attQuad, lv.distToL);
+
+    //float diffuseIntensity = saturate(dot(normalize(normals.xyz), normalize(vToL.xyz)));
+    float3 diffuseColor = Diffuse(colors.rgb, 1.0f, att, lv.dirToL /15.0f, normalize(normals.xyz));
     
     float3 camToFrag = worldSpacePos.xyz - camPos;
     
-    float3 specularResult = Speculate(specular.xyz, 1, normals.xyz, vToL, camToFrag, .5, 128);
+    float3 specularResult = Speculate(specular.xyz, 1, normalize(normals.xyz), lv.dirToL / 15.0f, camToFrag, att, 128);
     //return float4(1, 1, 1, 1);
-    if (len > 15)
-    {
-        return float4(0, 0, 0, 0);
-
-    }
-    else
-    {
-        return float4(color, 1) * colors * diffuseIntensity + float4(specularResult, 1.0f);
-    }
+    
+    return float4(color, 1) * (float4(diffuseColor, 1) + float4(specularResult, 1.0f));
+    
 }

@@ -24,6 +24,8 @@ DirectX::XMMATRIX Camera::GetMatrix() const noexcept
 	// camera "top" always faces towards +Y (cannot do barrel roll)
 	const auto camPosition = XMLoadFloat3( &pos );
 	const auto camTarget = camPosition + lookVector;
+
+	// this is the view matrix not the camera matrix
 	return XMMatrixLookAtLH( camPosition,camTarget,XMVectorSet( 0.0f,1.0f,0.0f,0.0f ) );
 }
 

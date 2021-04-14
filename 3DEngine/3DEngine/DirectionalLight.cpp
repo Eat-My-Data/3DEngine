@@ -19,12 +19,12 @@ DirectionalLight::DirectionalLight( Graphics& gfx )
 	AddBind( Sampler::Resolve( gfx ) );
 
 #if 1
-	DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant( gfx.GetCamera() );
+	/*DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant( gfx.GetCamera() );
 	DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixInverse( &determinant, gfx.GetCamera() );
 	lbuf.mvpMatrix = viewMatrix * gfx.GetProjection();
 	DirectX::XMVECTOR determinant2 = DirectX::XMMatrixDeterminant( lbuf.mvpMatrix );
 	DirectX::XMMATRIX viewMatrix2 = DirectX::XMMatrixInverse( &determinant2, lbuf.mvpMatrix );
-	lbuf.mvpMatrix = DirectX::XMMatrixTranspose( viewMatrix2 );
+	lbuf.mvpMatrix = DirectX::XMMatrixTranspose( viewMatrix2 );*/
 
 	//pcs2->Update( gfx, lbuf );
 #else
@@ -83,13 +83,20 @@ void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos )
 	//cambuf.camPos.z = gfx.GetCamera().r[3].m128_f32[2];
 	pcs->Update( gfx, cambuf );
 #if 1
-	lbuf.viewInvMatrix = gfx.GetCamera();
+	/*lbuf.viewInvMatrix = gfx.GetCamera();
 	DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant( gfx.GetCamera() );
 	DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixInverse( &determinant, gfx.GetCamera() );
 	lbuf.mvpMatrix = viewMatrix * gfx.GetProjection();
 	DirectX::XMVECTOR determinant2 = DirectX::XMMatrixDeterminant( lbuf.mvpMatrix );
 	DirectX::XMMATRIX viewMatrix2 = DirectX::XMMatrixInverse( &determinant2, lbuf.mvpMatrix );
-	lbuf.mvpMatrix = DirectX::XMMatrixTranspose( viewMatrix2 );
+	lbuf.mvpMatrix = DirectX::XMMatrixTranspose( viewMatrix2 );*/
+	DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant( gfx.GetCamera() );
+	DirectX::XMMATRIX cameraMatrix = DirectX::XMMatrixInverse( &determinant, gfx.GetCamera() );
+	//colorConst.mvpMatrix = viewMatrix * gfx.GetProjection();
+	lbuf.cameraMatrix = cameraMatrix;
+	DirectX::XMVECTOR determinant2 = DirectX::XMMatrixDeterminant( gfx.GetProjection() );
+	DirectX::XMMATRIX viewMatrix2 = DirectX::XMMatrixInverse( &determinant2, gfx.GetProjection() );
+	lbuf.projInvMatrix = viewMatrix2;// DirectX::XMMatrixTranspose( viewMatrix2 );
 	pcs2->Update( gfx, lbuf );
 	/*lbuf.viewInvMatrix = gfx.GetCamera();
 	DirectX::XMVECTOR determinant2 = DirectX::XMMatrixDeterminant( gfx.GetProjection() );

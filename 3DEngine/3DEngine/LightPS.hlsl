@@ -12,8 +12,8 @@ cbuffer LightBuffer : register(b0)
 {
     float3 lightDirection;
     float padding;
-    float4x4 mvpMatrix;
-    float4x4 viewInvMatrix;
+    row_major float4x4 cameraMatrix;
+    row_major float4x4 projInvMatrix;
 };
 #else
 cbuffer LightBuffer : register(b0)
@@ -45,22 +45,22 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     float clipX = (tex.x * 2.0) - 1.0;
     float clipY = (tex.y * 2.0) - 1.0;
     clipY = -clipY;
-    clipX = -clipX;
+    //clipX = -clipX;
     
     normals = (normals * 2.0) - 1.0;
     
 #if 1
     float4 worldDepth = float4(clipX, clipY, depthSample, 1.0);
-    float4 worldPosition = mul(worldDepth, mvpMatrix);
+    float4 worldPosition = mul(worldDepth, projInvMatrix);
     worldPosition /= worldPosition.w;
     
-    //float4 worldSpacePos = mul(worldPosition, viewInvMatrix);
+    float4 worldSpacePos = mul(worldPosition, cameraMatrix);
     
     //float4 camSpaceDepth = mul(float4(camPos, 1), mvpMatrix);
     //camSpaceDepth /= camSpaceDepth.w;
     //float4 camSpacePos = mul(camSpaceDepth, viewInvMatrix);
 
-    float3 camToFrag = worldPosition.xyz - camPos.xyz;
+    float3 camToFrag = worldSpacePos.xyz - camPos.xyz;
 #else
     float4 viewDepth = float4(clipX, clipY, depthSample, 1.0);
     float4 viewPosition = mul(projMatrixInv, viewDepth);

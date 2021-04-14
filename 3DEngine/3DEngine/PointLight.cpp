@@ -69,10 +69,10 @@ void PointLight::DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view,DirectX:
 	gfx.GetContext()->PSSetShaderResources( 0, 3, gfx.GetShaderResources() );
 	gfx.GetContext()->PSSetShaderResources( 3, 1, gfx.GetDepthResource() );
 
-	//DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant( gfx.GetCamera() );
-	//DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixInverse( &determinant, gfx.GetCamera() );
+	DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant( gfx.GetCamera() );
+	DirectX::XMMATRIX cameraMatrix = DirectX::XMMatrixInverse( &determinant, gfx.GetCamera() );
 	//colorConst.mvpMatrix = viewMatrix * gfx.GetProjection();
-	colorConst.cameraMatrix = gfx.GetCamera();
+	colorConst.cameraMatrix = cameraMatrix;
 	DirectX::XMVECTOR determinant2 = DirectX::XMMatrixDeterminant( gfx.GetProjection() );
 	DirectX::XMMATRIX viewMatrix2 = DirectX::XMMatrixInverse( &determinant2, gfx.GetProjection() );
 	colorConst.projInvMatrix = viewMatrix2;// DirectX::XMMatrixTranspose( viewMatrix2 );

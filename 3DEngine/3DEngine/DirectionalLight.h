@@ -22,8 +22,8 @@ private:
 	{
 		DirectX::XMFLOAT3 lightDirection = { 0.0f, -1.0f, -1.0f };
 		float padding;
-		DirectX::XMMATRIX mvpMatrix;
-		DirectX::XMMATRIX viewInvMatrix;
+		DirectX::XMMATRIX cameraMatrix;
+		DirectX::XMMATRIX projInvMatrix;
 		//DirectX::XMFLOAT3 camPos;
 		//float padding2;
 	} lbuf;
