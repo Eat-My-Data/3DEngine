@@ -24,6 +24,5 @@ PSOut main(float3 viewFragPos : Position, float3 viewNormal : Normal, float2 tc 
         
     // Store the normal for output to the render target.
     output.normal = float4(viewNormal, 1.0f);
-
     return output;
 }

@@ -5,7 +5,9 @@ struct PSOut
 {
     float4 color : SV_Target0;
     float4 normal : SV_Target1;
+    float4 specular : SV_Target2;
 };
+
 
 PSOut main(float3 viewFragPos : Position, float3 viewNormal : Normal, float2 tc : Texcoord) : SV_Target
 {
@@ -20,6 +22,7 @@ PSOut main(float3 viewFragPos : Position, float3 viewNormal : Normal, float2 tc 
     
     // Store the normal for output to the render target.
     output.normal = float4(viewNormal, 1.0f);
-
+    output.specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    
     return output;
 }
