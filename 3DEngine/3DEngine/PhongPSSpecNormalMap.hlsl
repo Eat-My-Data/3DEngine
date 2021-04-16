@@ -10,7 +10,7 @@ struct PSOut
     float4 specular : SV_Target2;
 };
 
-PSOut main(float3 viewFragPos : Position, float3 viewNormal : Normal, float3 viewTan : Tangent, float3 viewBitan : Bitangent, float2 tc : Texcoord) : SV_Target
+PSOut main(float3 viewFragPos : Position, float3 viewNormal : Normal, float3 viewTan : Tangent, float3 viewBitan : Bitangent, float2 tc : Texcoord)
 {
     PSOut output;
 

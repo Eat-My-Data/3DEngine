@@ -12,12 +12,19 @@ public:
 	void DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view, DirectX::XMFLOAT3 camPos );
 	void SetPos( DirectX::XMFLOAT3 vec );
 private:
-	//DirectX::XMFLOAT3 lightDirection;
-	ID3D11Buffer* m_lightBuffer;
 	struct PSColorConstant
 	{
 		DirectX::XMFLOAT3 color = { 1.0f,1.0f,1.0f };
-		float padding;
+		float radius;
+
+		float attConst = 0.0f;
+		float attLin = 0.045f;
+		float attQuad = 0.0075f;
+		float specularPower = 128.0f;
+
+		float diffuseIntensity = 1.0f;
+		float specularIntensity = 1.0f;
+
 		DirectX::XMMATRIX cameraMatrix;
 		DirectX::XMMATRIX projInvMatrix;
 	} colorConst;

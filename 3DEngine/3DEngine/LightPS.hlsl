@@ -11,6 +11,10 @@ cbuffer LightBuffer : register(b0)
 {
     float3 lightDirection;
     float padding;
+    float specularIntensity;
+    float att;
+    float specularPower;
+    float padding2;
     row_major float4x4 cameraMatrix;
     row_major float4x4 projInvMatrix;
 };
@@ -18,7 +22,7 @@ cbuffer LightBuffer : register(b0)
 cbuffer CamPosBuffer : register(b1)
 {
     float3 camPos;
-    float padding2;
+    float padding3;
 };
 
 
@@ -51,7 +55,7 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     float diffuseIntensity = saturate(dot(normalize(normals.xyz), normalize(-lightDirection.xyz)));
 
     // specular
-    float3 specularResult = Speculate(specular.xyz, 1, normalize(normals.xyz), normalize(-lightDirection), camToFrag, .5, 128);
+    float3 specularResult = Speculate(specular.xyz, specularIntensity, normalize(normals.xyz), normalize(-lightDirection), camToFrag, att, specularPower);
 
     // final color
     return colors * diffuseIntensity + float4(specularResult,1.0f);

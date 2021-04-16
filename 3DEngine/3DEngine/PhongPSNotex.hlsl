@@ -17,7 +17,7 @@ struct PSOut
 };
 
 
-PSOut main(float3 viewFragPos : Position, float3 viewNormal : Normal) : SV_Target
+PSOut main(float3 viewFragPos : Position, float3 viewNormal : Normal)
 {
     PSOut output;
     

@@ -24,6 +24,7 @@ PointLight::PointLight( Graphics& gfx, float radius )
 
 	AddBind( Sampler::Resolve( gfx ) );
 
+	colorConst.radius = radius;
 	pcs = PixelConstantBuffer<PSColorConstant>::Resolve( gfx, colorConst, 0u );
 	AddBind(  pcs );
 

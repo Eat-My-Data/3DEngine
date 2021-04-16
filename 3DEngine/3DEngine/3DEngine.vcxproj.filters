@@ -141,9 +141,6 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PointLight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SolidSphere.cpp">
       <Filter>Source Files\Drawable</Filter>
     </ClCompile>
@@ -190,6 +187,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Source Files\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
       <Filter>Source Files\Drawable</Filter>
     </ClCompile>
   </ItemGroup>
@@ -314,9 +314,6 @@
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PointLight.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SolidSphere.h">
       <Filter>Header Files\Drawable</Filter>
     </ClInclude>
@@ -399,6 +396,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DirectionalLight.h">
+      <Filter>Header Files\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
       <Filter>Header Files\Drawable</Filter>
     </ClInclude>
   </ItemGroup>

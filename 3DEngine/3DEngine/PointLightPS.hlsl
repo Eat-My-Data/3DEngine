@@ -11,7 +11,16 @@ SamplerState SampleTypePoint : register(s0);
 cbuffer CBuf : register(b0)
 {
     float3 color;
-    float padding;
+    float radius;
+    
+    float attConst;
+    float attLin;
+    float attQuad;
+    float specularPower;
+    
+    float diffuseIntensity;
+    float specularIntensity;
+    
     row_major float4x4 cameraMatrix;
     row_major float4x4 projInvMatrix;
 };
@@ -49,7 +58,6 @@ float4 main(float4 position : SV_POSITION) : SV_TARGET
     // normal to clip space
     normals = (normals * 2.0) - 1.0;
 
-    
     // world position
     float4 worldDepth = float4(clipX, clipY, depthSample, 1.0);
     float4 worldPosition = mul(worldDepth, projInvMatrix);
@@ -60,7 +68,7 @@ float4 main(float4 position : SV_POSITION) : SV_TARGET
     const LightVectorData lv = CalculateLightVectorData(lightPosition, worldSpacePos.xyz);
     
     // if distance is greater than radius then it shouldn't affect it
-    if ( lv.distToL > 15 )
+    if (lv.distToL > radius)
     {
         return float4(0, 0, 0, 0);
     }
@@ -69,16 +77,13 @@ float4 main(float4 position : SV_POSITION) : SV_TARGET
     float3 camToFrag = worldSpacePos.xyz - camPos;
     
     // attenutation
-    float attConst = 0.0f;
-    float attLin = 0.045f;
-    float attQuad = 0.0075f;
     float att = Attenuate(attConst, attLin, attQuad, lv.distToL);
 
     // diffuse
-    float3 diffuseColor = Diffuse(colors.rgb, 1.0f, att, lv.dirToL /15.0f, normalize(normals.xyz));
+    float3 diffuseColor = Diffuse(colors.rgb, diffuseIntensity, att, lv.dirToL / radius, normalize(normals.xyz));
     
     // specular
-    float3 specularResult = Speculate(specular.xyz, 1, normalize(normals.xyz), lv.dirToL / 15.0f, camToFrag, att, 128);
+    float3 specularResult = Speculate(specular.xyz, specularIntensity, normalize(normals.xyz), lv.dirToL / radius, camToFrag, att, specularPower);
     
     // final color
     return float4(color, 1) * (float4(diffuseColor, 1) + float4(specularResult, 1.0f));

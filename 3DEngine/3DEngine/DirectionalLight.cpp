@@ -18,10 +18,10 @@ DirectionalLight::DirectionalLight( Graphics& gfx )
 	AddBind( PixelShader::Resolve( gfx, "LightPS.cso" ) );\
 	AddBind( Sampler::Resolve( gfx ) );
 
-	pcs = PixelConstantBuffer<CamPosBuffer>::Resolve( gfx, cambuf, 1u );
+	pcs = PixelConstantBuffer<LightBufferType>::Resolve( gfx, lbuf, 0u );
 	AddBind( pcs );
 
-	pcs2 = PixelConstantBuffer<LightBufferType>::Resolve( gfx, lbuf, 0u );
+	pcs2 = PixelConstantBuffer<CamPosBuffer>::Resolve( gfx, cambuf, 1u );
 	AddBind( pcs2 );
 
 	AddBind( Topology::Resolve( gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
@@ -63,10 +63,6 @@ void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos )
 	gfx.GetContext()->PSSetShaderResources( 0, 3, gfx.GetShaderResources() );
 	gfx.GetContext()->PSSetShaderResources( 3, 1, gfx.GetDepthResource() );
 	
-	// update camera position
-	cambuf.camPos = camPos;
-	pcs->Update( gfx, cambuf );
-
 	// get camera matrix from view matrix
 	DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant( gfx.GetCamera() );
 	DirectX::XMMATRIX cameraMatrix = DirectX::XMMatrixInverse( &determinant, gfx.GetCamera() );
@@ -76,7 +72,11 @@ void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos )
 	DirectX::XMVECTOR determinant2 = DirectX::XMMatrixDeterminant( gfx.GetProjection() );
 	DirectX::XMMATRIX viewMatrix2 = DirectX::XMMatrixInverse( &determinant2, gfx.GetProjection() );
 	lbuf.projInvMatrix = viewMatrix2;
-	pcs2->Update( gfx, lbuf );
+	pcs->Update( gfx, lbuf );
+
+	// update camera position
+	cambuf.camPos = camPos;
+	pcs2->Update( gfx, cambuf );
 
 	// bindables
 	for ( auto& b : binds )
