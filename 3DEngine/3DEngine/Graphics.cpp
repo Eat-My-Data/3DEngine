@@ -116,7 +116,7 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 		}
 	}
 
-	//Setup blend state 
+	// Setup blend state 
 	D3D11_BLEND_DESC blendDescDR;
 	ZeroMemory( &blendDescDR, sizeof( blendDescDR ) );
 	blendDescDR.AlphaToCoverageEnable = false;
@@ -133,7 +133,7 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	pDevice->CreateBlendState( &blendDescDR, &blendState );
 
 
-	//Setup rasterizer state 
+	// Setup rasterizer state 
 	D3D11_RASTERIZER_DESC rasterizerDescDR;
 	ZeroMemory( &rasterizerDescDR, sizeof( rasterizerDescDR ) );
 	rasterizerDescDR.CullMode = D3D11_CULL_BACK;
@@ -176,7 +176,7 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 		pDepthStencil.Get(),&descDSV,&pDSV
 	) );
 
-
+	// create depth shader resource view
 	D3D11_SHADER_RESOURCE_VIEW_DESC depthShaderResourceDesc = {};
 	depthShaderResourceDesc.Format = DXGI_FORMAT_R32_FLOAT;
 	depthShaderResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;

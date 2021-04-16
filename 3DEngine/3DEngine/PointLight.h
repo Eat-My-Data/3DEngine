@@ -20,7 +20,6 @@ private:
 		float padding;
 		DirectX::XMMATRIX cameraMatrix;
 		DirectX::XMMATRIX projInvMatrix;
-		//DirectX::XMMATRIX viewMatrix;
 	} colorConst;
 	std::shared_ptr<Bind::PixelConstantBuffer<PSColorConstant>> pcs;
 
@@ -35,7 +34,6 @@ private:
 	{
 		DirectX::XMFLOAT3 camPos;
 		float padding2;
-		//DirectX::XMMATRIX camMatrix;
 	} cambuf;
 	std::shared_ptr<Bind::PixelConstantBuffer<CamPosBuffer>> pcs3;
 };

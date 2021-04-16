@@ -30,54 +30,57 @@ cbuffer CamPosBuffer : register(b2)
 
 float4 main(float4 position : SV_POSITION) : SV_TARGET
 {
+    // screen position
     float2 screenPos;
     screenPos.x = position.x / 1280.0f;
     screenPos.y = position.y / 720.0f;
-
+    
+    // sample textures
     float4 colors = colorTexture.Load(int3(position.xy, 0));
     float4 normals = normalTexture.Load(int3(position.xy, 0));
     float4 specular = specularTexture.Load(int3(position.xy, 0));
-
-    float depthSample = depthTexture.Load(int3(position.xy, 0)).r; //* 2.0 - 1.0;
+    float depthSample = depthTexture.Load(int3(position.xy, 0)).r;
+    
+    // clip space, negate y because directx
     float clipX = (screenPos.x * 2.0) - 1.0;
     float clipY = (screenPos.y * 2.0) - 1.0;
     clipY = -clipY;
-    //clipX = -clipX;
    
+    // normal to clip space
     normals = (normals * 2.0) - 1.0;
+
     
-    //float4 lightPos = mul(float4(lightPosition, 1), camMatrix);
-    //lightPos /= lightPos.w;
-    
+    // world position
     float4 worldDepth = float4(clipX, clipY, depthSample, 1.0);
     float4 worldPosition = mul(worldDepth, projInvMatrix);
     worldPosition /= worldPosition.w;
-    
-    //float4 newLight = mul(float4(lightPosition, 1), mvpMatrix);
     float4 worldSpacePos = mul(worldPosition, cameraMatrix);
+    
+    // light
     const LightVectorData lv = CalculateLightVectorData(lightPosition, worldSpacePos.xyz);
     
-    //float3 vToL = lightPosition.xyz - worldSpacePos.xyz;
-    //float len = length(vToL);
-    
+    // if distance is greater than radius then it shouldn't affect it
     if ( lv.distToL > 15 )
     {
         return float4(0, 0, 0, 0);
     }
     
+    // vector from camera to fragment
+    float3 camToFrag = worldSpacePos.xyz - camPos;
+    
+    // attenutation
     float attConst = 0.0f;
     float attLin = 0.045f;
     float attQuad = 0.0075f;
     float att = Attenuate(attConst, attLin, attQuad, lv.distToL);
 
-    //float diffuseIntensity = saturate(dot(normalize(normals.xyz), normalize(vToL.xyz)));
+    // diffuse
     float3 diffuseColor = Diffuse(colors.rgb, 1.0f, att, lv.dirToL /15.0f, normalize(normals.xyz));
     
-    float3 camToFrag = worldSpacePos.xyz - camPos;
-    
+    // specular
     float3 specularResult = Speculate(specular.xyz, 1, normalize(normals.xyz), lv.dirToL / 15.0f, camToFrag, att, 128);
-    //return float4(1, 1, 1, 1);
     
+    // final color
     return float4(color, 1) * (float4(diffuseColor, 1) + float4(specularResult, 1.0f));
     
 }
