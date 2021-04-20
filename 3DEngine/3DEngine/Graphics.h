@@ -82,7 +82,9 @@ public:
 	ID3D11ShaderResourceView** GetShaderResources() { return pShaderView; }
 	ID3D11ShaderResourceView** GetDepthResource() { return &depthShaderView; }
 	ID3D11BlendState* GetBlendState() { return blendState; }
-	ID3D11RasterizerState* GetRasterizerState() { return rasterizerDR; };
+	ID3D11RasterizerState* GetRasterizerStateInside() { return rasterizerInside; };
+	ID3D11RasterizerState* GetRasterizerStateOutside() { return rasterizerOutside; };
+	ID3D11DepthStencilState* GetLightingDepth() { return pDSStateLighting; }
 private:
 	DirectX::XMMATRIX projection;									// projection matrix
 	DirectX::XMMATRIX camera;										// camera matrix
@@ -102,6 +104,10 @@ private:
 	ID3D11RenderTargetView* lightBuffer;
 	ID3D11BlendState* blendState;
 	Microsoft::WRL::ComPtr<ID3D11Resource> pBackBuffer;
-	ID3D11RasterizerState* rasterizerDR;
+	ID3D11RasterizerState* rasterizerInside;
+	ID3D11RasterizerState* rasterizerOutside;
+
+	ID3D11DepthStencilState* pDSStateGeometry;
+	ID3D11DepthStencilState* pDSStateLighting;
 
 };

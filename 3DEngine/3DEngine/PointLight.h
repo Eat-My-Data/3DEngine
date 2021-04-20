@@ -11,6 +11,7 @@ public:
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
 	void DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view, DirectX::XMFLOAT3 camPos );
 	void SetPos( DirectX::XMFLOAT3 vec );
+	bool CameraIsInside( DirectX::XMFLOAT3 camPos );
 private:
 	struct PSColorConstant
 	{

@@ -44,7 +44,7 @@ PointLight::PointLight( Graphics& gfx, float radius )
 
 	AddBind( std::make_shared<TransformCbuf>( gfx, *this ) );
 
-	AddBind( Rasterizer::Resolve( gfx, true ) );
+	//AddBind( Rasterizer::Resolve( gfx, true ) );
 }
 
 void PointLight::SetDirection( DirectX::XMFLOAT3 direction ) noexcept
@@ -60,9 +60,24 @@ DirectX::XMMATRIX PointLight::GetTransformXM() const noexcept
 void PointLight::DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view,DirectX::XMFLOAT3 camPos )
 {
 	// set render target and shader resources
-	gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetLightBuffer(), NULL );
-	gfx.GetContext()->PSSetShaderResources( 0, 3, gfx.GetShaderResources() );
-	gfx.GetContext()->PSSetShaderResources( 3, 1, gfx.GetDepthResource() );
+	//gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetLightBuffer(), NULL );
+
+	//const float blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
+	//gfx.GetContext()->OMSetBlendState( gfx.GetBlendState(), blendFactor, 0xffffffff );
+
+	// figure out if camera is inside point light
+	if ( CameraIsInside( camPos ) )
+	{
+		// cull backface
+		gfx.GetContext()->RSSetState( gfx.GetRasterizerStateInside() );
+	}
+	else
+	{
+		gfx.GetContext()->RSSetState( gfx.GetRasterizerStateOutside() );
+	}
+
+	//gfx.GetContext()->PSSetShaderResources( 0, 3, gfx.GetShaderResources() );
+	//gfx.GetContext()->PSSetShaderResources( 3, 1, gfx.GetDepthResource() );
 
 	// get camera matrix from view matrix
 	DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant( gfx.GetCamera() );
@@ -102,3 +117,20 @@ void PointLight::SetPos( DirectX::XMFLOAT3 vec )
 	posConst.lightPosition.y += vec.y;
 	posConst.lightPosition.z += vec.z;
 }
+
+bool PointLight::CameraIsInside( DirectX::XMFLOAT3 camPos )
+{
+	float distFromCenterX = posConst.lightPosition.x - camPos.x;
+	float distFromCenterY = posConst.lightPosition.y - camPos.y;
+	float distFromCenterZ = posConst.lightPosition.z - camPos.z;
+	float xSq = distFromCenterX * distFromCenterX;
+	float ySq = distFromCenterY * distFromCenterY;
+	float zSq = distFromCenterZ * distFromCenterZ;
+	float distSq = xSq + ySq + zSq;
+
+	float radiusSq = colorConst.radius * colorConst.radius;
+
+	return distSq <= radiusSq;
+}
+
+

@@ -25,7 +25,7 @@ DirectionalLight::DirectionalLight( Graphics& gfx )
 	AddBind( pcs2 );
 
 	AddBind( Topology::Resolve( gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
-
+	//AddBind( Blender::Resolve( gfx, true ) );
 	AddBind( Rasterizer::Resolve( gfx, true ) );
 }
 
@@ -52,15 +52,17 @@ DirectX::XMMATRIX DirectionalLight::GetTransformXM() const noexcept
 void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos )
 {
 	// set render target
-	gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetLightBuffer(), NULL );
+	gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetLightBuffer(), gfx.GetDSV() );
+	gfx.GetContext()->OMSetDepthStencilState( gfx.GetLightingDepth(), 1u );
 
 	// set blend state for light values
-	gfx.GetContext()->RSSetState( gfx.GetRasterizerState() );
-	const float blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
-	gfx.GetContext()->OMSetBlendState( gfx.GetBlendState(), blendFactor, 0xFFFFFFFF );
+	//gfx.GetContext()->RSSetState( gfx.GetRasterizerState() );
+	const float blendFactor[4] = { 1.f, 1.f, 1.f, 1.f };
+	gfx.GetContext()->OMSetBlendState( gfx.GetBlendState(), blendFactor, 0xffffffff );
 
 	// set shader resources
 	gfx.GetContext()->PSSetShaderResources( 0, 3, gfx.GetShaderResources() );
+
 	gfx.GetContext()->PSSetShaderResources( 3, 1, gfx.GetDepthResource() );
 	
 	// get camera matrix from view matrix
@@ -88,6 +90,6 @@ void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos )
 	gfx.GetContext()->Draw( 3, 0 );
 
 	// clear shader resources
-	ID3D11ShaderResourceView* null[] = { nullptr, nullptr, nullptr, nullptr };
-	gfx.GetContext()->PSSetShaderResources( 0, 4, null );
+	//ID3D11ShaderResourceView* null[] = { nullptr, nullptr, nullptr, nullptr };
+	//gfx.GetContext()->PSSetShaderResources( 0, 4, null );
 }

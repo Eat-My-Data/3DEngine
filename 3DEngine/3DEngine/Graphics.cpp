@@ -125,6 +125,9 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	blendDescDR.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
 	blendDescDR.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
 	blendDescDR.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	//blendDescDR.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	//blendDescDR.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
+	//blendDescDR.RenderTarget[0].BlendOp = D3D11_BLEND_OP_MAX;
 	blendDescDR.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
 	blendDescDR.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
 	blendDescDR.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
@@ -133,25 +136,37 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	pDevice->CreateBlendState( &blendDescDR, &blendState );
 
 
-	// Setup rasterizer state 
-	D3D11_RASTERIZER_DESC rasterizerDescDR;
-	ZeroMemory( &rasterizerDescDR, sizeof( rasterizerDescDR ) );
-	rasterizerDescDR.CullMode = D3D11_CULL_BACK;
-	rasterizerDescDR.FillMode = D3D11_FILL_SOLID;
-	rasterizerDescDR.DepthClipEnable = false;
+	// Setup rasterizer state inside
+	D3D11_RASTERIZER_DESC rasterizerDescInside;
+	ZeroMemory( &rasterizerDescInside, sizeof( rasterizerDescInside ) );
+	rasterizerDescInside.CullMode = D3D11_CULL_NONE;
+	rasterizerDescInside.FillMode = D3D11_FILL_SOLID;
+	rasterizerDescInside.DepthClipEnable = false;
 
-	pDevice->CreateRasterizerState( &rasterizerDescDR, &rasterizerDR );
+	pDevice->CreateRasterizerState( &rasterizerDescInside, &rasterizerInside );
+
+	// Setup rasterizer state outside
+	D3D11_RASTERIZER_DESC rasterizerDescOutside;
+	ZeroMemory( &rasterizerDescOutside, sizeof( rasterizerDescOutside ) );
+	rasterizerDescOutside.CullMode = D3D11_CULL_BACK;
+	rasterizerDescOutside.FillMode = D3D11_FILL_SOLID;
+	rasterizerDescOutside.DepthClipEnable = false;
+
+	pDevice->CreateRasterizerState( &rasterizerDescOutside, &rasterizerOutside );
 
 	// create depth stensil descriptor
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
 	dsDesc.DepthEnable = TRUE;
 	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-	wrl::ComPtr<ID3D11DepthStencilState> pDSState;
-	GFX_THROW_INFO( pDevice->CreateDepthStencilState( &dsDesc,&pDSState ) );
+	GFX_THROW_INFO( pDevice->CreateDepthStencilState( &dsDesc,&pDSStateGeometry ) );
 
-	// bind depth state
-	pContext->OMSetDepthStencilState( pDSState.Get(),1u );
+	// create depth stensil descriptor
+	D3D11_DEPTH_STENCIL_DESC dsDescLight = {};
+	dsDesc.DepthEnable = FALSE;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	dsDesc.DepthFunc = D3D11_COMPARISON_NEVER;
+	GFX_THROW_INFO( pDevice->CreateDepthStencilState( &dsDescLight, &pDSStateLighting ) );
 
 	// create depth stensil texture
 	wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
@@ -234,6 +249,8 @@ void Graphics::BeginFrame( float red,float green,float blue ) noexcept
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 	}
+	// bind depth state
+	pContext->OMSetDepthStencilState( pDSStateGeometry, 1u );
 
 	pContext->OMSetRenderTargets( bufferCount, pTarget, pDSV );
 
