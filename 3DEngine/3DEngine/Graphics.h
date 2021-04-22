@@ -27,7 +27,7 @@ public:
 	class HrException : public Exception
 	{
 	public:
-		HrException( int line,const char* file,HRESULT hr,std::vector<std::string> infoMsgs = {} ) noexcept;
+		HrException( int line, const char* file, HRESULT hr, std::vector<std::string> infoMsgs = {} ) noexcept;
 		const char* what() const noexcept override;
 		virtual const char* GetType() const noexcept;
 		HRESULT GetErrorCode() const noexcept;
@@ -41,7 +41,7 @@ public:
 	class InfoException : public Exception
 	{
 	public:
-		InfoException( int line,const char* file,std::vector<std::string> infoMsgs = {} ) noexcept;
+		InfoException( int line, const char* file, std::vector<std::string> infoMsgs = {} ) noexcept;
 		const char* what() const noexcept override;
 		virtual const char* GetType() const noexcept;
 		std::string GetErrorInfo() const noexcept;
@@ -57,19 +57,19 @@ public:
 		std::string reason;
 	};
 public:
-	Graphics( HWND hWnd,int width,int height );						// initializes pDevice, pSwap, pContext, pTarget, pDSV, and ImGui
+	Graphics( HWND hWnd, int width, int height );						// initializes pDevice, pSwap, pContext, pTarget, pDSV, and ImGui
 	Graphics( const Graphics& ) = delete;
 	Graphics& operator=( const Graphics& ) = delete;
 	~Graphics() = default;
 	void EndFrame();												// render screen
-	void BeginFrame( float red,float green,float blue ) noexcept;	// set up frame
+	void BeginFrame( float red, float green, float blue ) noexcept;	// set up frame
 	void DrawIndexed( UINT count )  noxnd;							// draw indexed, non-instanced primitives
 	void SetProjection( DirectX::FXMMATRIX proj ) noexcept;			// setter for projection
 	DirectX::XMMATRIX GetProjection() const noexcept;				// getter for projection
 	void SetCamera( DirectX::FXMMATRIX cam ) noexcept;				// setter for camera
 	DirectX::XMMATRIX GetCamera() const noexcept;					// getter for camera
-	void EnableImgui() noexcept;									
-	void DisableImgui() noexcept;									
+	void EnableImgui() noexcept;
+	void DisableImgui() noexcept;
 	bool IsImguiEnabled() const noexcept;							// get imguiEnabled
 	ID3D11Device* GetDevice() { return pDevice; }
 	ID3D11DeviceContext* GetContext() { return pContext; }
@@ -85,6 +85,10 @@ public:
 	ID3D11RasterizerState* GetRasterizerStateInside() { return rasterizerInside; };
 	ID3D11RasterizerState* GetRasterizerStateOutside() { return rasterizerOutside; };
 	ID3D11DepthStencilState* GetLightingDepth() { return pDSStateLighting; }
+
+	ID3D11Texture2D* GetPDepthStencil() { return pDepthStencil.Get(); }
+	ID3D11ShaderResourceView** GetNewDepthResource() { return &pMyTarget; }
+	ID3D11Texture2D* GetTargetTexture() { return pMyTargetTexture.Get(); }
 private:
 	DirectX::XMMATRIX projection;									// projection matrix
 	DirectX::XMMATRIX camera;										// camera matrix
@@ -110,4 +114,11 @@ private:
 	ID3D11DepthStencilState* pDSStateGeometry;
 	ID3D11DepthStencilState* pDSStateLighting;
 
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthStencil;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> pMyTargetTexture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pMyTarget;
+	ID3D11ShaderResourceView* plswork;
+	ID3D11UnorderedAccessView* backBufferUAV = nullptr;
+
 };
+
