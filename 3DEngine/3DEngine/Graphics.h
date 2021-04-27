@@ -86,9 +86,9 @@ public:
 	ID3D11RasterizerState* GetRasterizerStateOutside() { return rasterizerOutside; };
 	ID3D11DepthStencilState* GetLightingDepth() { return pDSStateLighting; }
 
+	ID3D11DepthStencilView* GetDSV_ReadOnlyDepth() { return pDSV_ReadOnlyDepth; }
+
 	ID3D11Texture2D* GetPDepthStencil() { return pDepthStencil.Get(); }
-	ID3D11Texture2D* GetTargetTexture() { return pMyTargetTexture.Get(); }
-	ID3D11ShaderResourceView** GetSRV() { return &pMyTarget; }
 private:
 	DirectX::XMMATRIX projection;									// projection matrix
 	DirectX::XMMATRIX camera;										// camera matrix
@@ -115,9 +115,7 @@ private:
 	ID3D11DepthStencilState* pDSStateLighting;
 
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthStencil;
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> pMyTargetTexture;
-	ID3D11ShaderResourceView* pMyTarget;
-	ID3D11UnorderedAccessView* backBufferUAV = nullptr;
 
+	ID3D11DepthStencilView* pDSV_ReadOnlyDepth;
 };
 

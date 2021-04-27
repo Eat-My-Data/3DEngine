@@ -69,27 +69,6 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = 0;
 
-	// Initialize the render target texture description.
-	D3D11_TEXTURE2D_DESC textureDesc2 = {};
-	textureDesc2.Width = width;
-	textureDesc2.Height = height;
-	textureDesc2.MipLevels = 1;
-	textureDesc2.ArraySize = 1;
-	textureDesc2.Format = DXGI_FORMAT_R32_FLOAT;
-	textureDesc2.SampleDesc.Count = 1;
-	textureDesc2.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc2.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	textureDesc2.CPUAccessFlags = 0;
-	textureDesc2.MiscFlags = 0;
-
-	GFX_THROW_INFO( pDevice->CreateTexture2D( &textureDesc2, nullptr, &pMyTargetTexture ) );
-
-	GFX_THROW_INFO( pDevice->CreateShaderResourceView(
-		pMyTargetTexture.Get(),
-		nullptr,
-		&pMyTarget
-	) );
-
 	// Create the render target textures.
 	for ( int i = 0; i < bufferCount; i++ )
 	{
@@ -156,7 +135,7 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	// Setup rasterizer state inside
 	D3D11_RASTERIZER_DESC rasterizerDescInside;
 	ZeroMemory( &rasterizerDescInside, sizeof( rasterizerDescInside ) );
-	rasterizerDescInside.CullMode = D3D11_CULL_NONE;
+	rasterizerDescInside.CullMode = D3D11_CULL_FRONT;
 	rasterizerDescInside.FillMode = D3D11_FILL_SOLID;
 	rasterizerDescInside.DepthClipEnable = false;
 
@@ -205,6 +184,11 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	descDSV.Texture2D.MipSlice = 0u;
 	GFX_THROW_INFO( pDevice->CreateDepthStencilView(
 		pDepthStencil.Get(),&descDSV,&pDSV
+	) );
+
+	descDSV.Flags = D3D11_DSV_READ_ONLY_DEPTH;
+	GFX_THROW_INFO( pDevice->CreateDepthStencilView(
+		pDepthStencil.Get(), &descDSV, &pDSV_ReadOnlyDepth
 	) );
 
 	// create depth shader resource view

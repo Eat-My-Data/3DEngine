@@ -51,13 +51,8 @@ DirectX::XMMATRIX DirectionalLight::GetTransformXM() const noexcept
 
 void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos )
 {
-
-	// splat my target to the back buffer
-	gfx.GetContext()->CopyResource(  gfx.GetTargetTexture(), gfx.GetPDepthStencil() );
-
-
 	// set render target
-	gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetLightBuffer(), gfx.GetDSV() );
+	gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetLightBuffer(), gfx.GetDSV_ReadOnlyDepth() );
 	gfx.GetContext()->OMSetDepthStencilState( gfx.GetLightingDepth(), 1u );
 
 	// set blend state for light values
@@ -66,8 +61,7 @@ void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos )
 
 	// set shader resources
 	gfx.GetContext()->PSSetShaderResources( 0, 3, gfx.GetShaderResources() );
-
-	gfx.GetContext()->PSSetShaderResources( 3, 1, gfx.GetSRV() );
+	gfx.GetContext()->PSSetShaderResources( 3, 1, gfx.GetDepthResource() );
 	
 	// get camera matrix from view matrix
 	DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant( gfx.GetCamera() );
