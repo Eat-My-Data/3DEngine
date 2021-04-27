@@ -69,6 +69,27 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = 0;
 
+	// Initialize the render target texture description.
+	D3D11_TEXTURE2D_DESC textureDesc2 = {};
+	textureDesc2.Width = width;
+	textureDesc2.Height = height;
+	textureDesc2.MipLevels = 1;
+	textureDesc2.ArraySize = 1;
+	textureDesc2.Format = DXGI_FORMAT_R32_FLOAT;
+	textureDesc2.SampleDesc.Count = 1;
+	textureDesc2.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc2.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	textureDesc2.CPUAccessFlags = 0;
+	textureDesc2.MiscFlags = 0;
+
+	GFX_THROW_INFO( pDevice->CreateTexture2D( &textureDesc2, nullptr, &pMyTargetTexture ) );
+
+	GFX_THROW_INFO( pDevice->CreateShaderResourceView(
+		pMyTargetTexture.Get(),
+		nullptr,
+		&pMyTarget
+	) );
+
 	// Create the render target textures.
 	for ( int i = 0; i < bufferCount; i++ )
 	{
@@ -132,7 +153,6 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 
 	pDevice->CreateBlendState( &blendDescDR, &blendState );
 
-
 	// Setup rasterizer state inside
 	D3D11_RASTERIZER_DESC rasterizerDescInside;
 	ZeroMemory( &rasterizerDescInside, sizeof( rasterizerDescInside ) );
@@ -178,8 +198,6 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 	GFX_THROW_INFO( pDevice->CreateTexture2D( &descDepth,nullptr,&pDepthStencil ) );
 
-	GFX_THROW_INFO( pDevice->CreateTexture2D( &descDepth, nullptr, &pMyTargetTexture ) );
-
 	// create view of depth stenstil texture
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
 	descDSV.Format = DXGI_FORMAT_D32_FLOAT;
@@ -197,20 +215,7 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	depthShaderResourceDesc.Texture2D.MipLevels = 1;
 	HRESULT hr2 = pDevice->CreateShaderResourceView( pDepthStencil.Get(), &depthShaderResourceDesc, &depthShaderView );
 
-	GFX_THROW_INFO( pDevice->CreateShaderResourceView(
-		pMyTargetTexture.Get(),
-		&depthShaderResourceDesc,
-		&pMyTarget
-	) );
-
-	//pDevice->CreateShaderResourceView( pMyTargetTexture.Get(), &shaderResourceViewDesc, &plswork );
-
-	/*D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-	uavDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	uavDesc.ViewDimension = D3D11_UAV_DIMENSION::D3D11_UAV_DIMENSION_TEXTURE2D;
-	uavDesc.Texture2D.MipSlice = 0;
-	pDevice->CreateUnorderedAccessView( pMyTargetTexture.Get(), &uavDesc, &backBufferUAV );*/
-
+	
 	if ( FAILED(hr2) )
 	{
 		throw HrException( __LINE__, __FILE__, hr );

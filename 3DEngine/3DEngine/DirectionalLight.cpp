@@ -67,7 +67,7 @@ void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos )
 	// set shader resources
 	gfx.GetContext()->PSSetShaderResources( 0, 3, gfx.GetShaderResources() );
 
-	gfx.GetContext()->PSSetShaderResources( 3, 1, gfx.GetNewDepthResource() );
+	gfx.GetContext()->PSSetShaderResources( 3, 1, gfx.GetSRV() );
 	
 	// get camera matrix from view matrix
 	DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant( gfx.GetCamera() );
