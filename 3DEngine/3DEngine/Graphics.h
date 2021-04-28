@@ -73,17 +73,13 @@ public:
 	bool IsImguiEnabled() const noexcept;							// get imguiEnabled
 	ID3D11Device* GetDevice() { return pDevice; }
 	ID3D11DeviceContext* GetContext() { return pContext; }
-	ID3D11Resource* GetBackBuffer() { return pBackBuffer.Get(); }
-	ID3D11RenderTargetView** GetPTarget() { return pTarget; }
 	ID3D11DepthStencilView* GetDSV() { return pDSV; }
 	ID3D11RenderTargetView** GetLightBuffer() { return &lightBuffer; }
-	ID3D11ShaderResourceView* GetColorResource() { return pShaderView[0]; }
-	ID3D11ShaderResourceView* GetNormalResource() { return pShaderView[1]; }
+
 	ID3D11ShaderResourceView** GetShaderResources() { return pShaderView; }
 	ID3D11ShaderResourceView** GetDepthResource() { return &depthShaderView; }
+
 	ID3D11BlendState* GetBlendState() { return blendState; }
-	ID3D11RasterizerState* GetRasterizerStateInside() { return rasterizerInside; };
-	ID3D11RasterizerState* GetRasterizerStateOutside() { return rasterizerOutside; };
 	ID3D11DepthStencilState* GetLightingDepth() { return pDSStateLighting; }
 
 	ID3D11DepthStencilView* GetDSV_ReadOnlyDepth() { return pDSV_ReadOnlyDepth; }
@@ -108,8 +104,6 @@ private:
 	ID3D11RenderTargetView* lightBuffer;
 	ID3D11BlendState* blendState;
 	Microsoft::WRL::ComPtr<ID3D11Resource> pBackBuffer;
-	ID3D11RasterizerState* rasterizerInside;
-	ID3D11RasterizerState* rasterizerOutside;
 
 	ID3D11DepthStencilState* pDSStateGeometry;
 	ID3D11DepthStencilState* pDSStateLighting;

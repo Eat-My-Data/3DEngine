@@ -56,6 +56,9 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 		&pContext
 	) );
 
+
+
+	//=========================SHADER RESOURCES=========================
 	// Initialize the render target texture description.
 	D3D11_TEXTURE2D_DESC textureDesc = {};
 	textureDesc.Width = width;
@@ -115,6 +118,7 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 			throw HrException( __LINE__, __FILE__, result );
 		}
 	}
+	//=========================SHADER RESOURCES=========================
 
 
 
@@ -135,29 +139,6 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 
 	pDevice->CreateBlendState( &blendDescDR, &blendState );
 	//=========================BLEND STATE=========================
-
-
-
-
-	//=========================RASTERIZER=========================
-	// Setup rasterizer state inside
-	D3D11_RASTERIZER_DESC rasterizerDescInside;
-	ZeroMemory( &rasterizerDescInside, sizeof( rasterizerDescInside ) );
-	rasterizerDescInside.CullMode = D3D11_CULL_FRONT;
-	rasterizerDescInside.FillMode = D3D11_FILL_SOLID;
-	rasterizerDescInside.DepthClipEnable = false;
-
-	pDevice->CreateRasterizerState( &rasterizerDescInside, &rasterizerInside );
-
-	// Setup rasterizer state outside
-	D3D11_RASTERIZER_DESC rasterizerDescOutside;
-	ZeroMemory( &rasterizerDescOutside, sizeof( rasterizerDescOutside ) );
-	rasterizerDescOutside.CullMode = D3D11_CULL_BACK;
-	rasterizerDescOutside.FillMode = D3D11_FILL_SOLID;
-	rasterizerDescOutside.DepthClipEnable = false;
-
-	pDevice->CreateRasterizerState( &rasterizerDescOutside, &rasterizerOutside );
-	//=========================RASTERIZER=========================
 
 
 
@@ -210,7 +191,7 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 
 
 
-
+	//=========================DEPTH SHADER RESOURCE=========================
 	// create depth shader resource view
 	D3D11_SHADER_RESOURCE_VIEW_DESC depthShaderResourceDesc = {};
 	depthShaderResourceDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
@@ -219,11 +200,11 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	depthShaderResourceDesc.Texture2D.MipLevels = 1;
 	HRESULT hr2 = pDevice->CreateShaderResourceView( pDepthStencil.Get(), &depthShaderResourceDesc, &depthShaderView );
 
-	
 	if ( FAILED(hr2) )
 	{
 		throw HrException( __LINE__, __FILE__, hr );
 	}
+	//=========================DEPTH SHADER RESOURCE=========================
 
 
 

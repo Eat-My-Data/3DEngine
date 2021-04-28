@@ -93,6 +93,26 @@ PointLight::PointLight( Graphics& gfx, float radius )
 	{
 		throw ChiliException( __LINE__, __FILE__ );
 	}
+
+	//=========================RASTERIZER=========================
+	// Setup rasterizer state inside
+	D3D11_RASTERIZER_DESC rasterizerDescInside;
+	ZeroMemory( &rasterizerDescInside, sizeof( rasterizerDescInside ) );
+	rasterizerDescInside.CullMode = D3D11_CULL_FRONT;
+	rasterizerDescInside.FillMode = D3D11_FILL_SOLID;
+	rasterizerDescInside.DepthClipEnable = false;
+
+	gfx.GetDevice()->CreateRasterizerState( &rasterizerDescInside, &rasterizerInside );
+
+	// Setup rasterizer state outside
+	D3D11_RASTERIZER_DESC rasterizerDescOutside;
+	ZeroMemory( &rasterizerDescOutside, sizeof( rasterizerDescOutside ) );
+	rasterizerDescOutside.CullMode = D3D11_CULL_BACK;
+	rasterizerDescOutside.FillMode = D3D11_FILL_SOLID;
+	rasterizerDescOutside.DepthClipEnable = false;
+
+	gfx.GetDevice()->CreateRasterizerState( &rasterizerDescOutside, &rasterizerOutside );
+	//=========================RASTERIZER=========================
 }
 
 void PointLight::SetDirection( DirectX::XMFLOAT3 direction ) noexcept
@@ -138,7 +158,7 @@ void PointLight::DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view,DirectX:
 	if ( CameraIsInside( camPos ) )
 	{
 		gfx.GetContext()->PSSetShader( pPixelShader.Get(), nullptr, 0u );
-		gfx.GetContext()->RSSetState( gfx.GetRasterizerStateInside() );
+		gfx.GetContext()->RSSetState( rasterizerInside );
 		gfx.GetContext()->OMSetDepthStencilState( pDSStateInsideLighting, 1u );
 
 		// draw
@@ -147,14 +167,14 @@ void PointLight::DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view,DirectX:
 	else
 	{
 		gfx.GetContext()->PSSetShader( nullptr, nullptr, 0u );
-		gfx.GetContext()->RSSetState( gfx.GetRasterizerStateInside() );
+		gfx.GetContext()->RSSetState( rasterizerInside );
 		gfx.GetContext()->OMSetDepthStencilState( pDSStateInfrontBackFaceOfLight, 0x10 );
 
 		// draw
 		gfx.DrawIndexed( pIndexBuffer->GetCount() );
 
 		gfx.GetContext()->PSSetShader( pPixelShader.Get(), nullptr, 0u );
-		gfx.GetContext()->RSSetState( gfx.GetRasterizerStateOutside() );
+		gfx.GetContext()->RSSetState( rasterizerOutside );
 		gfx.GetContext()->OMSetDepthStencilState( pDSStateLightingBehindFrontFaceOfLight, 0x10 );
 
 		// draw

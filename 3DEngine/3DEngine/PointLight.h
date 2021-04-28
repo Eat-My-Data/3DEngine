@@ -47,6 +47,9 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
 
+	ID3D11RasterizerState* rasterizerInside;
+	ID3D11RasterizerState* rasterizerOutside;
+
 	ID3D11DepthStencilState* pDSStateInfrontBackFaceOfLight;
 	ID3D11DepthStencilState* pDSStateLightingBehindFrontFaceOfLight;
 	ID3D11DepthStencilState* pDSStateInsideLighting;
