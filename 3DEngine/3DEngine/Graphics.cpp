@@ -116,6 +116,9 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 		}
 	}
 
+
+
+	//=========================BLEND STATE=========================
 	// Setup blend state 
 	D3D11_BLEND_DESC blendDescDR;
 	ZeroMemory( &blendDescDR, sizeof( blendDescDR ) );
@@ -131,7 +134,12 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	blendDescDR.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
 	pDevice->CreateBlendState( &blendDescDR, &blendState );
+	//=========================BLEND STATE=========================
 
+
+
+
+	//=========================RASTERIZER=========================
 	// Setup rasterizer state inside
 	D3D11_RASTERIZER_DESC rasterizerDescInside;
 	ZeroMemory( &rasterizerDescInside, sizeof( rasterizerDescInside ) );
@@ -149,7 +157,11 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	rasterizerDescOutside.DepthClipEnable = false;
 
 	pDevice->CreateRasterizerState( &rasterizerDescOutside, &rasterizerOutside );
+	//=========================RASTERIZER=========================
 
+
+
+	//=========================DEPTH STENCIL STATES=========================
 	// create depth stensil descriptor
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
 	dsDesc.DepthEnable = TRUE;
@@ -164,13 +176,52 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	dsDesc.DepthFunc = D3D11_COMPARISON_NEVER;
 	GFX_THROW_INFO( pDevice->CreateDepthStencilState( &dsDescLight, &pDSStateLighting ) );
 
+	D3D11_DEPTH_STENCIL_DESC dsDesInsideLight = {};
+	dsDesInsideLight.DepthEnable = TRUE;
+	dsDesInsideLight.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	dsDesInsideLight.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
+	GFX_THROW_INFO( pDevice->CreateDepthStencilState( &dsDesInsideLight, &pDSStateInsideLighting ) );
+
+	D3D11_DEPTH_STENCIL_DESC dsDescInfrontBackFace = {};
+	dsDescInfrontBackFace.DepthEnable = TRUE;
+	dsDescInfrontBackFace.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	dsDescInfrontBackFace.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
+	dsDescInfrontBackFace.StencilEnable = TRUE;
+	dsDescInfrontBackFace.StencilReadMask = 0xFF;
+	dsDescInfrontBackFace.StencilWriteMask = 0xFF;
+	dsDescInfrontBackFace.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDescInfrontBackFace.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDescInfrontBackFace.FrontFace.StencilFunc = D3D11_COMPARISON_GREATER;
+	dsDescInfrontBackFace.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+	dsDescInfrontBackFace.BackFace = dsDescInfrontBackFace.FrontFace;
+	GFX_THROW_INFO( pDevice->CreateDepthStencilState( &dsDescInfrontBackFace, &pDSStateInfrontBackFaceOfLight ) );
+
+
+	D3D11_DEPTH_STENCIL_DESC dsDescBehindFrontFace = {};
+	dsDescBehindFrontFace.DepthEnable = TRUE;
+	dsDescBehindFrontFace.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	dsDescBehindFrontFace.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	dsDescBehindFrontFace.StencilEnable = TRUE;
+	dsDescBehindFrontFace.StencilReadMask = 0xFF;
+	dsDescBehindFrontFace.StencilWriteMask = 0xFF;
+	dsDescBehindFrontFace.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDescBehindFrontFace.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_ZERO;
+	dsDescBehindFrontFace.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
+	dsDescBehindFrontFace.FrontFace.StencilPassOp = D3D11_STENCIL_OP_ZERO;
+	dsDescBehindFrontFace.BackFace = dsDescInfrontBackFace.FrontFace;
+	GFX_THROW_INFO( pDevice->CreateDepthStencilState( &dsDescBehindFrontFace, &pDSStateLightingBehindFrontFaceOfLight ) );
+	//=========================DEPTH STENCIL STATES=========================
+
+
+
+	//=========================DEPTH STENCIL VIEWS=========================
 	// create depth stensil texture
 	D3D11_TEXTURE2D_DESC descDepth = {};
 	descDepth.Width = width;
 	descDepth.Height = height;
 	descDepth.MipLevels = 1u;
 	descDepth.ArraySize = 1u;
-	descDepth.Format = DXGI_FORMAT_R32_TYPELESS;
+	descDepth.Format = DXGI_FORMAT_R24G8_TYPELESS;
 	descDepth.SampleDesc.Count = 1u;
 	descDepth.SampleDesc.Quality = 0u;
 	descDepth.Usage = D3D11_USAGE_DEFAULT;
@@ -179,7 +230,7 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 
 	// create view of depth stenstil texture
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
-	descDSV.Format = DXGI_FORMAT_D32_FLOAT;
+	descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	descDSV.Texture2D.MipSlice = 0u;
 	GFX_THROW_INFO( pDevice->CreateDepthStencilView(
@@ -190,10 +241,14 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	GFX_THROW_INFO( pDevice->CreateDepthStencilView(
 		pDepthStencil.Get(), &descDSV, &pDSV_ReadOnlyDepth
 	) );
+	//=========================DEPTH STENCIL VIEWS=========================
+
+
+
 
 	// create depth shader resource view
 	D3D11_SHADER_RESOURCE_VIEW_DESC depthShaderResourceDesc = {};
-	depthShaderResourceDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	depthShaderResourceDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
 	depthShaderResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	depthShaderResourceDesc.Texture2D.MostDetailedMip = 0;
 	depthShaderResourceDesc.Texture2D.MipLevels = 1;
@@ -205,6 +260,9 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 		throw HrException( __LINE__, __FILE__, hr );
 	}
 
+
+
+	//=========================VIEWPORT=========================
 	// configure viewport
 	D3D11_VIEWPORT vp;
 	vp.Width = (float)width;

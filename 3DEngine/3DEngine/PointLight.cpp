@@ -20,7 +20,10 @@ PointLight::PointLight( Graphics& gfx, float radius )
 	auto pvsbc = pvs->GetBytecode();
 	AddBind( std::move( pvs ) );
 
-	AddBind( PixelShader::Resolve( gfx, "PointLightPS.cso" ) );
+	//AddBind( PixelShader::Resolve( gfx, "PointLightPS.cso" ) );
+	Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
+	D3DReadFileToBlob( L"PointLightPS.cso", &pBlob );
+	gfx.GetDevice()->CreatePixelShader( pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader );
 
 	AddBind( Sampler::Resolve( gfx ) );
 
@@ -43,8 +46,6 @@ PointLight::PointLight( Graphics& gfx, float radius )
 	AddBind( Topology::Resolve( gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
 
 	AddBind( std::make_shared<TransformCbuf>( gfx, *this ) );
-
-	//AddBind( Rasterizer::Resolve( gfx, true ) );
 }
 
 void PointLight::SetDirection( DirectX::XMFLOAT3 direction ) noexcept
@@ -59,16 +60,8 @@ DirectX::XMMATRIX PointLight::GetTransformXM() const noexcept
 
 void PointLight::DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view,DirectX::XMFLOAT3 camPos )
 {
-	// figure out if camera is inside point light
-	if ( CameraIsInside( camPos ) )
-	{
-		// cull backface
-		gfx.GetContext()->RSSetState( gfx.GetRasterizerStateInside() );
-	}
-	else
-	{
-		gfx.GetContext()->RSSetState( gfx.GetRasterizerStateOutside() );
-	}
+	// set render target
+	gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetLightBuffer(), gfx.GetDSV_ReadOnlyDepth() );
 
 	// get camera matrix from view matrix
 	DirectX::XMVECTOR determinant = DirectX::XMMatrixDeterminant( gfx.GetCamera() );
@@ -94,8 +87,34 @@ void PointLight::DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view,DirectX:
 		b->Bind( gfx );
 	}
 
-	// draw
-	gfx.DrawIndexed( pIndexBuffer->GetCount() );
+	// figure out if camera is inside point light
+	if ( CameraIsInside( camPos ) )
+	{
+		gfx.GetContext()->PSSetShader( pPixelShader.Get(), nullptr, 0u );
+		// cull backface
+		gfx.GetContext()->RSSetState( gfx.GetRasterizerStateInside() );
+		gfx.GetContext()->OMSetDepthStencilState( gfx.GetStateInsideLighting(), 1u );
+
+
+		// draw
+		gfx.DrawIndexed( pIndexBuffer->GetCount() );
+	}
+	else
+	{
+		gfx.GetContext()->PSSetShader( nullptr, nullptr, 0u );
+		gfx.GetContext()->RSSetState( gfx.GetRasterizerStateInside() );
+		gfx.GetContext()->OMSetDepthStencilState( gfx.GetStateInfrontBackFaceOfLight(), 0x10 );
+
+		// draw
+		gfx.DrawIndexed( pIndexBuffer->GetCount() );
+
+		gfx.GetContext()->PSSetShader( pPixelShader.Get(), nullptr, 0u );
+		gfx.GetContext()->RSSetState( gfx.GetRasterizerStateOutside() );
+		gfx.GetContext()->OMSetDepthStencilState( gfx.GetStateLightingBehindFrontFaceOfLight(), 0x10 );
+
+		// draw
+		gfx.DrawIndexed( pIndexBuffer->GetCount() );
+	}
 
 	// clear shader resources
 	ID3D11ShaderResourceView* null[] = { nullptr, nullptr, nullptr, nullptr };

@@ -67,12 +67,6 @@ float4 main(float4 position : SV_POSITION) : SV_TARGET
     // light
     const LightVectorData lv = CalculateLightVectorData(lightPosition, worldSpacePos.xyz);
     
-    // if distance is greater than radius then it shouldn't affect it
-    if (lv.distToL > radius)
-    {
-        return float4(0, 0, 0, 0);
-    }
-    
     // vector from camera to fragment
     float3 camToFrag = worldSpacePos.xyz - camPos;
     

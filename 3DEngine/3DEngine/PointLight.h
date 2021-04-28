@@ -44,4 +44,6 @@ private:
 		float padding2;
 	} cambuf;
 	std::shared_ptr<Bind::PixelConstantBuffer<CamPosBuffer>> pcs3;
+
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
 };
