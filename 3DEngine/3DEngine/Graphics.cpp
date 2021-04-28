@@ -175,41 +175,6 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 	dsDesc.DepthFunc = D3D11_COMPARISON_NEVER;
 	GFX_THROW_INFO( pDevice->CreateDepthStencilState( &dsDescLight, &pDSStateLighting ) );
-
-	D3D11_DEPTH_STENCIL_DESC dsDesInsideLight = {};
-	dsDesInsideLight.DepthEnable = TRUE;
-	dsDesInsideLight.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-	dsDesInsideLight.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
-	GFX_THROW_INFO( pDevice->CreateDepthStencilState( &dsDesInsideLight, &pDSStateInsideLighting ) );
-
-	D3D11_DEPTH_STENCIL_DESC dsDescInfrontBackFace = {};
-	dsDescInfrontBackFace.DepthEnable = TRUE;
-	dsDescInfrontBackFace.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-	dsDescInfrontBackFace.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
-	dsDescInfrontBackFace.StencilEnable = TRUE;
-	dsDescInfrontBackFace.StencilReadMask = 0xFF;
-	dsDescInfrontBackFace.StencilWriteMask = 0xFF;
-	dsDescInfrontBackFace.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	dsDescInfrontBackFace.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-	dsDescInfrontBackFace.FrontFace.StencilFunc = D3D11_COMPARISON_GREATER;
-	dsDescInfrontBackFace.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
-	dsDescInfrontBackFace.BackFace = dsDescInfrontBackFace.FrontFace;
-	GFX_THROW_INFO( pDevice->CreateDepthStencilState( &dsDescInfrontBackFace, &pDSStateInfrontBackFaceOfLight ) );
-
-
-	D3D11_DEPTH_STENCIL_DESC dsDescBehindFrontFace = {};
-	dsDescBehindFrontFace.DepthEnable = TRUE;
-	dsDescBehindFrontFace.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-	dsDescBehindFrontFace.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-	dsDescBehindFrontFace.StencilEnable = TRUE;
-	dsDescBehindFrontFace.StencilReadMask = 0xFF;
-	dsDescBehindFrontFace.StencilWriteMask = 0xFF;
-	dsDescBehindFrontFace.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	dsDescBehindFrontFace.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_ZERO;
-	dsDescBehindFrontFace.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
-	dsDescBehindFrontFace.FrontFace.StencilPassOp = D3D11_STENCIL_OP_ZERO;
-	dsDescBehindFrontFace.BackFace = dsDescInfrontBackFace.FrontFace;
-	GFX_THROW_INFO( pDevice->CreateDepthStencilState( &dsDescBehindFrontFace, &pDSStateLightingBehindFrontFaceOfLight ) );
 	//=========================DEPTH STENCIL STATES=========================
 
 

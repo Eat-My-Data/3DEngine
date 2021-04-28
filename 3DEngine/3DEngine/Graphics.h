@@ -87,9 +87,6 @@ public:
 	ID3D11DepthStencilState* GetLightingDepth() { return pDSStateLighting; }
 
 	ID3D11DepthStencilView* GetDSV_ReadOnlyDepth() { return pDSV_ReadOnlyDepth; }
-	ID3D11DepthStencilState* GetStateInfrontBackFaceOfLight() { return pDSStateInfrontBackFaceOfLight; }
-	ID3D11DepthStencilState* GetStateLightingBehindFrontFaceOfLight() { return pDSStateLightingBehindFrontFaceOfLight; }
-	ID3D11DepthStencilState* GetStateInsideLighting() { return pDSStateInsideLighting; }
 
 	ID3D11Texture2D* GetPDepthStencil() { return pDepthStencil.Get(); }
 private:
@@ -116,9 +113,6 @@ private:
 
 	ID3D11DepthStencilState* pDSStateGeometry;
 	ID3D11DepthStencilState* pDSStateLighting;
-	ID3D11DepthStencilState* pDSStateInfrontBackFaceOfLight;
-	ID3D11DepthStencilState* pDSStateLightingBehindFrontFaceOfLight;
-	ID3D11DepthStencilState* pDSStateInsideLighting;
 
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthStencil;
 

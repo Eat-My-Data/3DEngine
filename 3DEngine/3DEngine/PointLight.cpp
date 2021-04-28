@@ -46,6 +46,53 @@ PointLight::PointLight( Graphics& gfx, float radius )
 	AddBind( Topology::Resolve( gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
 
 	AddBind( std::make_shared<TransformCbuf>( gfx, *this ) );
+
+
+	D3D11_DEPTH_STENCIL_DESC dsDesInsideLight = {};
+	dsDesInsideLight.DepthEnable = TRUE;
+	dsDesInsideLight.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	dsDesInsideLight.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
+	HRESULT hr = gfx.GetDevice()->CreateDepthStencilState( &dsDesInsideLight, &pDSStateInsideLighting );
+	if ( FAILED( hr ) )
+	{
+		throw ChiliException( __LINE__, __FILE__ );
+	}
+
+	D3D11_DEPTH_STENCIL_DESC dsDescInfrontBackFace = {};
+	dsDescInfrontBackFace.DepthEnable = TRUE;
+	dsDescInfrontBackFace.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	dsDescInfrontBackFace.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
+	dsDescInfrontBackFace.StencilEnable = TRUE;
+	dsDescInfrontBackFace.StencilReadMask = 0xFF;
+	dsDescInfrontBackFace.StencilWriteMask = 0xFF;
+	dsDescInfrontBackFace.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDescInfrontBackFace.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDescInfrontBackFace.FrontFace.StencilFunc = D3D11_COMPARISON_GREATER;
+	dsDescInfrontBackFace.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+	dsDescInfrontBackFace.BackFace = dsDescInfrontBackFace.FrontFace;
+	hr = gfx.GetDevice()->CreateDepthStencilState( &dsDescInfrontBackFace, &pDSStateInfrontBackFaceOfLight );
+	if ( FAILED( hr ) )
+	{
+		throw ChiliException( __LINE__, __FILE__ );
+	}
+
+	D3D11_DEPTH_STENCIL_DESC dsDescBehindFrontFace = {};
+	dsDescBehindFrontFace.DepthEnable = TRUE;
+	dsDescBehindFrontFace.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	dsDescBehindFrontFace.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	dsDescBehindFrontFace.StencilEnable = TRUE;
+	dsDescBehindFrontFace.StencilReadMask = 0xFF;
+	dsDescBehindFrontFace.StencilWriteMask = 0xFF;
+	dsDescBehindFrontFace.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDescBehindFrontFace.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_ZERO;
+	dsDescBehindFrontFace.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
+	dsDescBehindFrontFace.FrontFace.StencilPassOp = D3D11_STENCIL_OP_ZERO;
+	dsDescBehindFrontFace.BackFace = dsDescInfrontBackFace.FrontFace;
+	hr = gfx.GetDevice()->CreateDepthStencilState( &dsDescBehindFrontFace, &pDSStateLightingBehindFrontFaceOfLight );
+	if ( FAILED( hr ) )
+	{
+		throw ChiliException( __LINE__, __FILE__ );
+	}
 }
 
 void PointLight::SetDirection( DirectX::XMFLOAT3 direction ) noexcept
@@ -91,10 +138,8 @@ void PointLight::DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view,DirectX:
 	if ( CameraIsInside( camPos ) )
 	{
 		gfx.GetContext()->PSSetShader( pPixelShader.Get(), nullptr, 0u );
-		// cull backface
 		gfx.GetContext()->RSSetState( gfx.GetRasterizerStateInside() );
-		gfx.GetContext()->OMSetDepthStencilState( gfx.GetStateInsideLighting(), 1u );
-
+		gfx.GetContext()->OMSetDepthStencilState( pDSStateInsideLighting, 1u );
 
 		// draw
 		gfx.DrawIndexed( pIndexBuffer->GetCount() );
@@ -103,14 +148,14 @@ void PointLight::DrawPointLight( Graphics& gfx, DirectX::FXMMATRIX view,DirectX:
 	{
 		gfx.GetContext()->PSSetShader( nullptr, nullptr, 0u );
 		gfx.GetContext()->RSSetState( gfx.GetRasterizerStateInside() );
-		gfx.GetContext()->OMSetDepthStencilState( gfx.GetStateInfrontBackFaceOfLight(), 0x10 );
+		gfx.GetContext()->OMSetDepthStencilState( pDSStateInfrontBackFaceOfLight, 0x10 );
 
 		// draw
 		gfx.DrawIndexed( pIndexBuffer->GetCount() );
 
 		gfx.GetContext()->PSSetShader( pPixelShader.Get(), nullptr, 0u );
 		gfx.GetContext()->RSSetState( gfx.GetRasterizerStateOutside() );
-		gfx.GetContext()->OMSetDepthStencilState( gfx.GetStateLightingBehindFrontFaceOfLight(), 0x10 );
+		gfx.GetContext()->OMSetDepthStencilState( pDSStateLightingBehindFrontFaceOfLight, 0x10 );
 
 		// draw
 		gfx.DrawIndexed( pIndexBuffer->GetCount() );

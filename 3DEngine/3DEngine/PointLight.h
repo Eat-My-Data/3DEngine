@@ -46,4 +46,8 @@ private:
 	std::shared_ptr<Bind::PixelConstantBuffer<CamPosBuffer>> pcs3;
 
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
+
+	ID3D11DepthStencilState* pDSStateInfrontBackFaceOfLight;
+	ID3D11DepthStencilState* pDSStateLightingBehindFrontFaceOfLight;
+	ID3D11DepthStencilState* pDSStateInsideLighting;
 };
