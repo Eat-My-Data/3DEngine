@@ -200,6 +200,7 @@
     <ClCompile Include="ChiliException.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="Projection.cpp" />
     <ClCompile Include="Rasterizer.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="ScriptCommander.cpp" />
@@ -257,6 +258,7 @@
     <ClInclude Include="json.hpp" />
     <ClInclude Include="LayoutCodex.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Projection.h" />
     <ClInclude Include="Rasterizer.h" />
     <ClInclude Include="ScriptCommander.h" />
     <ClInclude Include="Testing.h" />

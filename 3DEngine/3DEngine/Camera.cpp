@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include "imgui/imgui.h"
 #include "ChiliMath.h"
+#include "Graphics.h"
 
 namespace dx = DirectX;
 
@@ -9,9 +10,16 @@ Camera::Camera( std::string name,DirectX::XMFLOAT3 homePos,float homePitch,float
 	name( std::move( name ) ),
 	homePos( homePos ),
 	homePitch( homePitch ),
-	homeYaw( homeYaw )
+	homeYaw( homeYaw ),
+	proj( 1.0f, 9.0f / 16.0f, 0.5f, 400.0f ) 
 {
 	Reset();
+}
+
+void Camera::BindToGraphics( Graphics& gfx ) const
+{
+	gfx.SetCamera( GetMatrix() );
+	gfx.SetProjection( proj.GetMatrix() );
 }
 
 DirectX::XMMATRIX Camera::GetMatrix() const noexcept
@@ -34,9 +42,9 @@ DirectX::XMMATRIX Camera::GetMatrix() const noexcept
 void Camera::SpawnControlWidgets() noexcept
 {
 	ImGui::Text( "Position" );
-	ImGui::SliderFloat( "X",&pos.x,-80.0f,80.0f,"%.1f" );
-	ImGui::SliderFloat( "Y",&pos.y,-80.0f,80.0f,"%.1f" );
-	ImGui::SliderFloat( "Z",&pos.z,-80.0f,80.0f,"%.1f" );
+	ImGui::SliderFloat( "X",&pos.x,-80.0f,80.0f );
+	ImGui::SliderFloat( "Y",&pos.y,-80.0f,80.0f );
+	ImGui::SliderFloat( "Z",&pos.z,-80.0f,80.0f );
 	ImGui::Text( "Orientation" );
 	ImGui::SliderAngle( "Pitch",&pitch,0.995f * -90.0f,0.995f * 90.0f );
 	ImGui::SliderAngle( "Yaw",&yaw,-180.0f,180.0f );
@@ -44,6 +52,7 @@ void Camera::SpawnControlWidgets() noexcept
 	{
 		Reset();
 	}
+	proj.RenderWidgets();
 }
 
 void Camera::Reset() noexcept

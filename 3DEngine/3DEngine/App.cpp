@@ -20,15 +20,13 @@ App::App( const std::string& commandLine )
 {
 	cameras.AddCamera( std::make_unique<Camera>( "A", dx::XMFLOAT3{ -13.5f,6.0f,3.5f }, 0.0f, PI / 2.0f ) );
 	cameras.AddCamera( std::make_unique<Camera>( "B", dx::XMFLOAT3{ -13.5f,28.8f,-6.4f }, PI / 180.0f * 13.0f, PI / 180.0f * 61.0f ) );
-
-	wnd.Gfx().SetProjection( dx::XMMatrixPerspectiveLH( 1.0f,9.0f / 16.0f,0.5f,400.0f ) );
 }
 
 void App::DoFrame()
 {
 	const auto dt = timer.Mark() * speed_factor;
 	wnd.Gfx().BeginFrame( 0.07f,0.0f,0.12f );
-	wnd.Gfx().SetCamera( cameras.GetCamera().GetMatrix() );
+	cameras.GetCamera().BindToGraphics( wnd.Gfx() );
 
 	sponza.Draw( wnd.Gfx() );
 	dirShadowMap.CreateShadowMap( wnd.Gfx(), dirLight.GetLightDirection() );
