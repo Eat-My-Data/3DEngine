@@ -71,6 +71,12 @@ public:
 	void EnableImgui() noexcept;
 	void DisableImgui() noexcept;
 	bool IsImguiEnabled() const noexcept;							// get imguiEnabled
+
+	void BindModelResources() const noexcept;
+	void BindModelShadowRTV() const noexcept;
+
+	ID3D11RenderTargetView** GetModelTargets() { return pTarget; }
+
 	ID3D11Device* GetDevice() { return pDevice; }
 	ID3D11DeviceContext* GetContext() { return pContext; }
 	ID3D11DepthStencilView* GetDSV() { return pDSV; }
@@ -90,6 +96,7 @@ public:
 	ID3D11Texture2D* GetShadowTexture() { return pShadowMap; }
 	ID3D11RenderTargetView** GetShadowRTV() { return &pShadowMapDepthView; }
 	ID3D11ShaderResourceView* GetShadowSRV() { return pShadowMapSRView; }
+	ID3D11DepthStencilState* GetGemoetryDSS() { return pDSStateGeometry; }
 private:
 	DirectX::XMMATRIX projection;									// projection matrix
 	DirectX::XMMATRIX camera;										// camera matrix
@@ -118,6 +125,7 @@ private:
 	ID3D11DepthStencilView* pDSV_ReadOnlyDepth;
 
 	// shadow map resources
+	ID3D11DepthStencilView* pDSV_ShadowPass;
 	ID3D11Texture2D* pShadowMap;
 	ID3D11RenderTargetView* pShadowMapDepthView;
 	ID3D11ShaderResourceView* pShadowMapSRView;

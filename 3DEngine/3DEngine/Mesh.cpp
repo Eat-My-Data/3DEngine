@@ -48,10 +48,17 @@ Mesh::Mesh( Graphics& gfx,std::vector<std::shared_ptr<Bind::Bindable>> bindPtrs 
 
 	AddBind( std::make_shared<Bind::TransformCbuf>( gfx,*this ) );
 }
-void Mesh::Draw( Graphics& gfx,DirectX::FXMMATRIX accumulatedTransform ) const noxnd
+void Mesh::Draw( Graphics& gfx,DirectX::FXMMATRIX accumulatedTransform,bool isShadowPass ) const noxnd
 {
 	DirectX::XMStoreFloat4x4( &transform,accumulatedTransform );
-	Drawable::Draw( gfx );
+	if ( !isShadowPass )
+	{
+		Drawable::Draw( gfx );
+	}
+	else
+	{
+		Drawable::DrawModelDepth( gfx );
+	}
 }
 DirectX::XMMATRIX Mesh::GetTransformXM() const noexcept
 {
@@ -70,7 +77,7 @@ Node::Node( int id,const std::string& name,std::vector<Mesh*> meshPtrs,const Dir
 	dx::XMStoreFloat4x4( &appliedTransform,dx::XMMatrixIdentity() );
 }
 
-void Node::Draw( Graphics& gfx,DirectX::FXMMATRIX accumulatedTransform ) const noxnd
+void Node::Draw( Graphics& gfx,DirectX::FXMMATRIX accumulatedTransform, bool isShadowPass ) const noxnd
 {
 	const auto built =
 		dx::XMLoadFloat4x4( &appliedTransform ) *
@@ -78,11 +85,11 @@ void Node::Draw( Graphics& gfx,DirectX::FXMMATRIX accumulatedTransform ) const n
 		accumulatedTransform;
 	for( const auto pm : meshPtrs )
 	{
-		pm->Draw( gfx,built );
+		pm->Draw( gfx,built,isShadowPass );
 	}
 	for( const auto& pc : childPtrs )
 	{
-		pc->Draw( gfx,built );
+		pc->Draw( gfx,built,isShadowPass );
 	}
 }
 
@@ -348,13 +355,13 @@ Model::Model( Graphics& gfx,const std::string& pathString,const float scale )
 	pRoot = ParseNode( nextId,*pScene->mRootNode );
 }
 
-void Model::Draw( Graphics& gfx ) const noxnd
+void Model::Draw( Graphics& gfx,bool isShadowPass ) const noxnd
 {
 	// I'm still not happy about updating parameters (i.e. mutating a bindable GPU state
 	// which is part of a mesh which is part of a node which is part of the model that is
 	// const in this call) Can probably do this elsewhere
 	pWindow->ApplyParameters();
-	pRoot->Draw( gfx,dx::XMMatrixIdentity() );
+	pRoot->Draw( gfx,dx::XMMatrixIdentity(),isShadowPass );
 }
 
 void Model::ShowWindow( Graphics& gfx,const char* windowName ) noexcept

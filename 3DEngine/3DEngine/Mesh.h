@@ -29,7 +29,7 @@ class Mesh : public Drawable
 {
 public:
 	Mesh( Graphics& gfx,std::vector<std::shared_ptr<Bind::Bindable>> bindPtrs );
-	void Draw( Graphics& gfx,DirectX::FXMMATRIX accumulatedTransform ) const noxnd;
+	void Draw( Graphics& gfx,DirectX::FXMMATRIX accumulatedTransform,bool isShadowPass ) const noxnd;
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
 private:
 	mutable DirectX::XMFLOAT4X4 transform;
@@ -40,7 +40,7 @@ class Node
 	friend class Model;
 public:
 	Node( int id,const std::string& name,std::vector<Mesh*> meshPtrs,const DirectX::XMMATRIX& transform ) noxnd;
-	void Draw( Graphics& gfx,DirectX::FXMMATRIX accumulatedTransform ) const noxnd;
+	void Draw( Graphics& gfx,DirectX::FXMMATRIX accumulatedTransform,bool isShadowPass ) const noxnd;
 	void SetAppliedTransform( DirectX::FXMMATRIX transform ) noexcept;
 	const DirectX::XMFLOAT4X4& GetAppliedTransform() const noexcept;
 	int GetId() const noexcept;
@@ -62,7 +62,7 @@ class Model
 {
 public:
 	Model( Graphics& gfx,const std::string& pathString,float scale = 1.0f );
-	void Draw( Graphics& gfx ) const noxnd;
+	void Draw( Graphics& gfx, bool isShadowPass ) const noxnd;
 	void ShowWindow( Graphics& gfx,const char* windowName = nullptr ) noexcept;
 	void SetRootTransform( DirectX::FXMMATRIX tf ) noexcept;
 	~Model() noexcept;

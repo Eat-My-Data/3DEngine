@@ -8,12 +8,12 @@ DirectionalShadowMap::DirectionalShadowMap( Graphics& gfx )
 	using namespace Bind;
 	namespace dx = DirectX;
 
-	auto pvs = VertexShader::Resolve( gfx, "ShadowMapVS.cso" );
+	//auto pvs = VertexShader::Resolve( gfx, "ShadowMapVS.cso" );
 
-	auto pvsbc = pvs->GetBytecode();
-	AddBind( std::move( pvs ) );
+	//auto pvsbc = pvs->GetBytecode();
+	//AddBind( std::move( pvs ) );
 
-	AddBind( PixelShader::Resolve( gfx, "ShadowMapPS.cso" ) ); \
+	//AddBind( PixelShader::Resolve( gfx, "ShadowMapPS.cso" ) ); \
 		AddBind( Sampler::Resolve( gfx ) );
 
 	pcs = PixelConstantBuffer<ShadowMapConstant>::Resolve( gfx, sbuf, 0u );

@@ -174,6 +174,8 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 	GFX_THROW_INFO( pDevice->CreateTexture2D( &descDepth,nullptr,&pDepthStencil ) );
 
+	GFX_THROW_INFO( pDevice->CreateTexture2D( &descDepth, nullptr, &pShadowMap ) ); // for shadow map
+
 	// create view of depth stenstil texture
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
 	descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -181,6 +183,10 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	descDSV.Texture2D.MipSlice = 0u;
 	GFX_THROW_INFO( pDevice->CreateDepthStencilView(
 		pDepthStencil.Get(),&descDSV,&pDSV
+	) );
+
+	GFX_THROW_INFO( pDevice->CreateDepthStencilView(
+		pShadowMap, &descDSV, &pDSV_ShadowPass
 	) );
 
 	descDSV.Flags = D3D11_DSV_READ_ONLY_DEPTH;
@@ -209,7 +215,6 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 
 
 	//=========================SHADOW MAP TEXTURE=========================
-	//create texture and depth/resource views
 	hr = pDevice->CreateTexture2D( &textureDesc, NULL, &pShadowMap );
 	if ( FAILED( hr ) )
 	{
@@ -278,21 +283,19 @@ void Graphics::BeginFrame( float red,float green,float blue ) noexcept
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 	}
-	// bind depth state
-	pContext->OMSetDepthStencilState( pDSStateGeometry, 1u );
-
-	pContext->OMSetRenderTargets( bufferCount, pTarget, pDSV );
 
 	const float color[] = { red,green,blue,1.0f };
 	// Clear the render target buffers.
 	for ( int i = 0; i < bufferCount; i++ )
 	{
 		pContext->ClearRenderTargetView( pTarget[i], color );
-	}
+	} 
 	float val[4] = { 0, 0, 0, 0 };
 	pContext->ClearRenderTargetView( lightBuffer, val );
+	pContext->ClearRenderTargetView( pShadowMapDepthView, val );
 
 	pContext->ClearDepthStencilView( pDSV,D3D11_CLEAR_DEPTH,1.0f,0u );
+	pContext->ClearDepthStencilView( pDSV_ShadowPass, D3D11_CLEAR_DEPTH, 1.0f, 0u );
 }
 
 void Graphics::DrawIndexed( UINT count ) noxnd
@@ -333,6 +336,22 @@ void Graphics::DisableImgui() noexcept
 bool Graphics::IsImguiEnabled() const noexcept
 {
 	return imguiEnabled;
+}
+
+void Graphics::BindModelResources() const noexcept
+{
+	// bind depth state
+	pContext->OMSetDepthStencilState( pDSStateGeometry, 1u );
+
+	pContext->OMSetRenderTargets( 3, pTarget, pDSV );
+}
+
+void Graphics::BindModelShadowRTV() const noexcept
+{
+	pContext->OMSetDepthStencilState( pDSStateGeometry, 1u );
+
+	// add ability to write depth values
+	pContext->OMSetRenderTargets( 0,nullptr, pDSV_ShadowPass );
 }
 
 

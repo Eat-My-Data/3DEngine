@@ -40,5 +40,10 @@ Camera& CameraContainer::GetCamera()
 	return *cameras[selected];
 }
 
+Camera& CameraContainer::GetDirLightCamera()
+{
+	return *cameras[1];
+}
+
 CameraContainer::~CameraContainer()
 {}

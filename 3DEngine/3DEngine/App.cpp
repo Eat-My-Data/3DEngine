@@ -26,10 +26,15 @@ void App::DoFrame()
 {
 	const auto dt = timer.Mark() * speed_factor;
 	wnd.Gfx().BeginFrame( 0.07f,0.0f,0.12f );
-	cameras.GetCamera().BindToGraphics( wnd.Gfx() );
 
-	sponza.Draw( wnd.Gfx() );
-	dirShadowMap.CreateShadowMap( wnd.Gfx(), dirLight.GetLightDirection() );
+	cameras.GetDirLightCamera().BindToGraphics( wnd.Gfx() );
+	wnd.Gfx().BindModelShadowRTV();
+	sponza.Draw( wnd.Gfx(), true );
+
+	cameras.GetCamera().BindToGraphics( wnd.Gfx() );
+	wnd.Gfx().BindModelResources();
+	sponza.Draw( wnd.Gfx(),false );
+
 	dirLight.DrawDirLight( wnd.Gfx(), cameras.GetCamera().GetPos() );
 	light.DrawPointLight( wnd.Gfx(), cameras.GetCamera().GetMatrix(), cameras.GetCamera().GetPos() );
 
