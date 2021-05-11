@@ -174,7 +174,8 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 	GFX_THROW_INFO( pDevice->CreateTexture2D( &descDepth,nullptr,&pDepthStencil ) );
 
-	GFX_THROW_INFO( pDevice->CreateTexture2D( &descDepth, nullptr, &pShadowMap ) ); // for shadow map
+	// for shadow map
+	GFX_THROW_INFO( pDevice->CreateTexture2D( &descDepth, nullptr, &pShadowMap ) );
 
 	// create view of depth stenstil texture
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
@@ -214,25 +215,13 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 
 
 
-	//=========================SHADOW MAP TEXTURE=========================
-	hr = pDevice->CreateTexture2D( &textureDesc, NULL, &pShadowMap );
+	//=========================SHADOW SHADER RESOURCE=========================
+	hr = pDevice->CreateShaderResourceView( pShadowMap, &depthShaderResourceDesc, &pShadowMapSRView );
 	if ( FAILED( hr ) )
 	{
 		throw HrException( __LINE__, __FILE__, hr );
 	}
-
-	hr = pDevice->CreateRenderTargetView( pShadowMap, &renderTargetViewDesc, &pShadowMapDepthView );
-	if ( FAILED( hr ) )
-	{
-		throw HrException( __LINE__, __FILE__, hr );
-	}
-
-	hr = pDevice->CreateShaderResourceView( pShadowMap, &shaderResourceViewDesc, &pShadowMapSRView );
-	if ( FAILED( hr ) )
-	{
-		throw HrException( __LINE__, __FILE__, hr );
-	}
-	//=========================SHADOW MAP TEXTURE=========================
+	//=========================SHADOW SHADER RESOURCE=========================
 
 
 
@@ -292,7 +281,6 @@ void Graphics::BeginFrame( float red,float green,float blue ) noexcept
 	} 
 	float val[4] = { 0, 0, 0, 0 };
 	pContext->ClearRenderTargetView( lightBuffer, val );
-	pContext->ClearRenderTargetView( pShadowMapDepthView, val );
 
 	pContext->ClearDepthStencilView( pDSV,D3D11_CLEAR_DEPTH,1.0f,0u );
 	pContext->ClearDepthStencilView( pDSV_ShadowPass, D3D11_CLEAR_DEPTH, 1.0f, 0u );

@@ -94,7 +94,6 @@ public:
 
 	// shadow map resources
 	ID3D11Texture2D* GetShadowTexture() { return pShadowMap; }
-	ID3D11RenderTargetView** GetShadowRTV() { return &pShadowMapDepthView; }
 	ID3D11ShaderResourceView* GetShadowSRV() { return pShadowMapSRView; }
 	ID3D11DepthStencilState* GetGemoetryDSS() { return pDSStateGeometry; }
 private:
@@ -127,7 +126,6 @@ private:
 	// shadow map resources
 	ID3D11DepthStencilView* pDSV_ShadowPass;
 	ID3D11Texture2D* pShadowMap;
-	ID3D11RenderTargetView* pShadowMapDepthView;
 	ID3D11ShaderResourceView* pShadowMapSRView;
 };
 
