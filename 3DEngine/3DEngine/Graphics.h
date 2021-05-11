@@ -85,6 +85,11 @@ public:
 	ID3D11DepthStencilView* GetDSV_ReadOnlyDepth() { return pDSV_ReadOnlyDepth; }
 
 	ID3D11Texture2D* GetPDepthStencil() { return pDepthStencil.Get(); }
+
+	// shadow map resources
+	ID3D11Texture2D* GetShadowTexture() { return pShadowMap; }
+	ID3D11RenderTargetView** GetShadowRTV() { return &pShadowMapDepthView; }
+	ID3D11ShaderResourceView* GetShadowSRV() { return pShadowMapSRView; }
 private:
 	DirectX::XMMATRIX projection;									// projection matrix
 	DirectX::XMMATRIX camera;										// camera matrix
@@ -111,5 +116,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthStencil;
 
 	ID3D11DepthStencilView* pDSV_ReadOnlyDepth;
+
+	// shadow map resources
+	ID3D11Texture2D* pShadowMap;
+	ID3D11RenderTargetView* pShadowMapDepthView;
+	ID3D11ShaderResourceView* pShadowMapSRView;
 };
 

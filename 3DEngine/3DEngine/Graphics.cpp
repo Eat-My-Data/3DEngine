@@ -198,13 +198,36 @@ Graphics::Graphics( HWND hWnd,int width,int height )
 	depthShaderResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	depthShaderResourceDesc.Texture2D.MostDetailedMip = 0;
 	depthShaderResourceDesc.Texture2D.MipLevels = 1;
-	HRESULT hr2 = pDevice->CreateShaderResourceView( pDepthStencil.Get(), &depthShaderResourceDesc, &depthShaderView );
+	hr = pDevice->CreateShaderResourceView( pDepthStencil.Get(), &depthShaderResourceDesc, &depthShaderView );
 
-	if ( FAILED(hr2) )
+	if ( FAILED(hr) )
 	{
 		throw HrException( __LINE__, __FILE__, hr );
 	}
 	//=========================DEPTH SHADER RESOURCE=========================
+
+
+
+	//=========================SHADOW MAP TEXTURE=========================
+	//create texture and depth/resource views
+	hr = pDevice->CreateTexture2D( &textureDesc, NULL, &pShadowMap );
+	if ( FAILED( hr ) )
+	{
+		throw HrException( __LINE__, __FILE__, hr );
+	}
+
+	hr = pDevice->CreateRenderTargetView( pShadowMap, &renderTargetViewDesc, &pShadowMapDepthView );
+	if ( FAILED( hr ) )
+	{
+		throw HrException( __LINE__, __FILE__, hr );
+	}
+
+	hr = pDevice->CreateShaderResourceView( pShadowMap, &shaderResourceViewDesc, &pShadowMapSRView );
+	if ( FAILED( hr ) )
+	{
+		throw HrException( __LINE__, __FILE__, hr );
+	}
+	//=========================SHADOW MAP TEXTURE=========================
 
 
 

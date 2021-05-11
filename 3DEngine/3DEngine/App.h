@@ -2,12 +2,13 @@
 #include "Window.h"
 #include "FrameTimer.h"
 #include "ImguiManager.h"
-#include "Camera.h"
+#include "CameraContainer.h"
 #include "PointLight.h"
 #include "TestPlane.h"
 #include "Mesh.h"
 #include "ScriptCommander.h"
 #include "DirectionalLight.h"
+#include "DirectionalShadowMap.h"
 #include <set>
 
 class App
@@ -27,8 +28,9 @@ private:
 	ScriptCommander scriptCommander;
 	FrameTimer timer;											// world clock
 	float speed_factor = 1.0f;									// time manipulation
-	Camera cam;													// configurable view matrix
+	CameraContainer cameras;
 	PointLight light;											// configurable light source
 	Model sponza{ wnd.Gfx(),"Models\\sponza\\sponza.obj",1.0f / 20.0f };
 	DirectionalLight dirLight;
+	DirectionalShadowMap dirShadowMap;
 };

@@ -10,6 +10,7 @@ public:
 	void SpawnControlWindow( Graphics& gfx ) noexcept;
 	void DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos );
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
+	DirectX::XMFLOAT3 GetLightDirection() { return lbuf.lightDirection; };
 private:
 	struct LightBufferType
 	{
