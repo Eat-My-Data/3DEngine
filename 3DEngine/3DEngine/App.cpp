@@ -5,6 +5,7 @@
 #include "Surface.h"
 #include "imgui/imgui.h"
 #include "VertexBuffer.h"
+#include "Projection.h"
 #include "ChiliUtil.h"
 
 namespace dx = DirectX;
@@ -18,8 +19,11 @@ App::App( const std::string& commandLine )
 	dirLight( wnd.Gfx() ),
 	light( wnd.Gfx(), 15.0f )
 {
-	cameras.AddCamera( std::make_unique<Camera>( "A", dx::XMFLOAT3{ -13.5f,6.0f,3.5f }, 0.0f, PI / 2.0f ) );
-	cameras.AddCamera( std::make_unique<Camera>( "B", dx::XMFLOAT3{ -13.5f,28.8f,-6.4f }, PI / 180.0f * 13.0f, PI / 180.0f * 61.0f ) );
+	Perspective* pPersp = new Perspective( 1.0f, 9.0f / 16.0f, 0.5f, 400.0f );
+	Orthogonal* pOrtho = new Orthogonal( 400.0f, 400.0f, 0.5f, 400.0f );
+
+	cameras.AddCamera( std::make_unique<Camera>( "A", pPersp, dx::XMFLOAT3{ -13.5f,6.0f,3.5f }, 0.0f, PI / 2.0f ) );
+	cameras.AddCamera( std::make_unique<Camera>( "B", pOrtho, dx::XMFLOAT3{ 0.0f,150.8f,0.0f }, PI / 180.0f * 13.0f, PI / 180.0f * 61.0f ) );
 }
 
 void App::DoFrame()
@@ -27,14 +31,17 @@ void App::DoFrame()
 	const auto dt = timer.Mark() * speed_factor;
 	wnd.Gfx().BeginFrame( 0.07f,0.0f,0.12f );
 
-	cameras.GetDirLightCamera().BindToGraphics( wnd.Gfx() );
-	wnd.Gfx().BindModelShadowRTV();
-	sponza.Draw( wnd.Gfx(), true );
-
+	// gbuffer pass
 	cameras.GetCamera().BindToGraphics( wnd.Gfx() );
 	wnd.Gfx().BindModelResources();
 	sponza.Draw( wnd.Gfx(),false );
 
+	// depth from light pass
+	cameras.GetDirLightCamera().BindToGraphics( wnd.Gfx() );
+	wnd.Gfx().BindModelShadowRTV();
+	sponza.Draw( wnd.Gfx(), true );
+
+	// lighting pass
 	dirLight.DrawDirLight( wnd.Gfx(), cameras.GetCamera().GetPos() );
 	light.DrawPointLight( wnd.Gfx(), cameras.GetCamera().GetMatrix(), cameras.GetCamera().GetPos() );
 

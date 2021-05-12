@@ -36,10 +36,6 @@ void Drawable::DrawModelDepth( Graphics& gfx ) const noxnd
 		b->Bind( gfx );
 	}
 
-	// change what vertex/pixel shaders are being used
-	//auto pvs = VertexShader::Resolve( gfx, "ShadowMapVS.cso" );
-	//auto pvsbc = pvs->GetBytecode();
-	//pvs->Bind( gfx );
 	gfx.GetContext()->PSSetShader( nullptr, nullptr, 0u );
 
 	// draw

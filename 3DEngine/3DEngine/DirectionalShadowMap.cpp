@@ -13,8 +13,8 @@ DirectionalShadowMap::DirectionalShadowMap( Graphics& gfx )
 	//auto pvsbc = pvs->GetBytecode();
 	//AddBind( std::move( pvs ) );
 
-	//AddBind( PixelShader::Resolve( gfx, "ShadowMapPS.cso" ) ); \
-		AddBind( Sampler::Resolve( gfx ) );
+	//AddBind( PixelShader::Resolve( gfx, "ShadowMapPS.cso" ) );
+	//	AddBind( Sampler::Resolve( gfx ) );
 
 	pcs = PixelConstantBuffer<ShadowMapConstant>::Resolve( gfx, sbuf, 0u );
 	AddBind( pcs );
@@ -41,7 +41,7 @@ void DirectionalShadowMap::CreateShadowMap( Graphics& gfx, DirectX::XMFLOAT3 lig
 	//DirectX::XMMATRIX orthoLH = DirectX::XMMatrixOrthographicLH( m_ViewWidth, m_ViewHeight, m_NearZ, m_FarZ );
 
 	// set render target
-	gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetShadowRTV(), 0 );
+	//gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetShadowRTV(), 0 );
 
 	// bindables
 	for ( auto& b : binds )

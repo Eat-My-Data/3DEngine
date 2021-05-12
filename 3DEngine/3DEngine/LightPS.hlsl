@@ -4,6 +4,7 @@ Texture2D colorTexture : register(t0);
 Texture2D normalTexture : register(t1);
 Texture2D specularTexture : register(t2);
 Texture2D depthTexture : register(t3);
+Texture2D depthTextureFromLight : register(t4);
 
 SamplerState SampleTypePoint : register(s0);
 
@@ -33,6 +34,7 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     float4 normals = normalTexture.Sample(SampleTypePoint, tex);
     float4 specular = specularTexture.Sample(SampleTypePoint, tex);
     float depthSample = (depthTexture.Sample(SampleTypePoint, tex).r * 2.0) - 1.0;
+    float depthSampleFromLight = (depthTextureFromLight.Sample(SampleTypePoint, tex).r * 2.0) -1.0;;
     
     // clip space, negate y because directx
     float clipX = (tex.x * 2.0) - 1.0;

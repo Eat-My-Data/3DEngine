@@ -12,10 +12,10 @@ struct PSOut
 PSOut main(float3 viewFragPos : Position, float3 viewNormal : Normal, float2 tc : Texcoord)
 {
     PSOut output;
-
+    
     // Sample the color from the texture and store it for output to the render target.
     output.color = tex.Sample(splr, tc);
-	
+    
     // 0 to 1 for normal
     viewNormal = normalize(viewNormal);
     viewNormal = (viewNormal + 1) / 2;

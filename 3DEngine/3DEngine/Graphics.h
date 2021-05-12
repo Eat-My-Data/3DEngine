@@ -94,7 +94,7 @@ public:
 
 	// shadow map resources
 	ID3D11Texture2D* GetShadowTexture() { return pShadowMap; }
-	ID3D11ShaderResourceView* GetShadowSRV() { return pShadowMapSRView; }
+	ID3D11ShaderResourceView** GetShadowSRV() { return &pShadowMapSRView; }
 	ID3D11DepthStencilState* GetGemoetryDSS() { return pDSStateGeometry; }
 private:
 	DirectX::XMMATRIX projection;									// projection matrix

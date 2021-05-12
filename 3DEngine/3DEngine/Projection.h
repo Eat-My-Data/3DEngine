@@ -5,11 +5,26 @@ class Projection
 {
 public:
 	Projection( float width, float height, float nearZ, float farZ );
-	DirectX::XMMATRIX GetMatrix() const;
+	virtual DirectX::XMMATRIX GetMatrix() const = 0;
 	void RenderWidgets();
-private:
+protected:
 	float width;
 	float height;
 	float nearZ;
 	float farZ;
+};
+
+class Perspective : public Projection
+{
+public:
+	Perspective( float width, float height, float nearZ, float farZ );
+	DirectX::XMMATRIX GetMatrix() const override;
+};
+
+
+class Orthogonal : public Projection
+{
+public:
+	Orthogonal( float width, float height, float nearZ, float farZ );
+	DirectX::XMMATRIX GetMatrix() const override;
 };
