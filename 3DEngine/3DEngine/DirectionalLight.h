@@ -8,7 +8,7 @@ public:
 	DirectionalLight( Graphics& gfx );
 	void SetDirection( DirectX::XMFLOAT3 direction ) noexcept;
 	void SpawnControlWindow( Graphics& gfx ) noexcept;
-	void DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos );
+	void DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos, DirectX::XMMATRIX orthoMatrix,DirectX::XMFLOAT3 lightPos );
 	DirectX::XMMATRIX GetTransformXM() const noexcept override;
 	DirectX::XMFLOAT3 GetLightDirection() { return lbuf.lightDirection; };
 private:
@@ -28,6 +28,9 @@ private:
 	{
 		DirectX::XMFLOAT3 camPos;
 		float padding3;
+		DirectX::XMFLOAT3 lightPos;
+		float padding4;
+		DirectX::XMMATRIX lightMatrix;
 	} cambuf;
 	std::shared_ptr<Bind::PixelConstantBuffer<CamPosBuffer>> pcs2;
 };

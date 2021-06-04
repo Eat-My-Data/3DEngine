@@ -49,7 +49,7 @@ DirectX::XMMATRIX DirectionalLight::GetTransformXM() const noexcept
 	return DirectX::XMMatrixTranslation( 1.0f, 1.0f, 1.0f );
 }
 
-void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos )
+void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos , DirectX::XMMATRIX orthoMatrix, DirectX::XMFLOAT3 lightPos )
 {
 	// set render target
 	gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetLightBuffer(), gfx.GetDSV_ReadOnlyDepth() );
@@ -77,6 +77,8 @@ void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos )
 
 	// update camera position
 	cambuf.camPos = camPos;
+	cambuf.lightMatrix = orthoMatrix;
+	cambuf.lightPos = lightPos;
 	pcs2->Update( gfx, cambuf );
 
 	// bindables
@@ -89,6 +91,6 @@ void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos )
 	gfx.GetContext()->Draw( 3, 0 );
 
 	// clear shader resources
-	//ID3D11ShaderResourceView* null[] = { nullptr, nullptr, nullptr, nullptr };
-	//gfx.GetContext()->PSSetShaderResources( 0, 4, null );
+	ID3D11ShaderResourceView* null[] = { nullptr, nullptr, nullptr, nullptr, nullptr };
+	gfx.GetContext()->PSSetShaderResources( 0, 5, null );
 }

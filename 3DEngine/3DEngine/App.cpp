@@ -20,10 +20,10 @@ App::App( const std::string& commandLine )
 	light( wnd.Gfx(), 15.0f )
 {
 	Perspective* pPersp = new Perspective( 1.0f, 9.0f / 16.0f, 0.5f, 400.0f );
-	Orthogonal* pOrtho = new Orthogonal( 400.0f, 400.0f, 0.5f, 400.0f );
+	Orthogonal* pOrtho = new Orthogonal( 400.0f, 400.0f, 1.0f, 1200.0f );
 
 	cameras.AddCamera( std::make_unique<Camera>( "A", pPersp, dx::XMFLOAT3{ -13.5f,6.0f,3.5f }, 0.0f, PI / 2.0f ) );
-	cameras.AddCamera( std::make_unique<Camera>( "B", pOrtho, dx::XMFLOAT3{ 0.0f,150.8f,0.0f }, PI / 180.0f * 13.0f, PI / 180.0f * 61.0f ) );
+	cameras.AddCamera( std::make_unique<Camera>( "B", pOrtho, dx::XMFLOAT3{ 0.0f,200.8f,100.0f }, PI / 2.0f, -PI ) );
 }
 
 void App::DoFrame()
@@ -42,7 +42,7 @@ void App::DoFrame()
 	sponza.Draw( wnd.Gfx(), true );
 
 	// lighting pass
-	dirLight.DrawDirLight( wnd.Gfx(), cameras.GetCamera().GetPos() );
+	dirLight.DrawDirLight( wnd.Gfx(), cameras.GetCamera().GetPos(),cameras.GetDirLightCamera().GetMatrix(),cameras.GetDirLightCamera().GetPos() );
 	light.DrawPointLight( wnd.Gfx(), cameras.GetCamera().GetMatrix(), cameras.GetCamera().GetPos() );
 
 	while ( const auto e = wnd.kbd.ReadKey() )
