@@ -73,7 +73,7 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     
     if (depthTextureFromLight.Sample(SampleTypePoint, lightPosition.xy).z > worldSpacePos.z) //depthSample > test.z)
     {
-        return colors * float4(.2, .2, .2, .2);
+        //return colors * float4(.2, .2, .2, .2);
     }
     
     // vector from camera to fragment

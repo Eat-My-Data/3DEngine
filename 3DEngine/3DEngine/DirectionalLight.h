@@ -14,7 +14,7 @@ public:
 private:
 	struct LightBufferType
 	{
-		DirectX::XMFLOAT3 lightDirection = { 0.0f, -1.0f, -1.0f };
+		DirectX::XMFLOAT3 lightDirection = { 0.0f, -1.0f, 0.0f };
 		float padding;
 		float specularIntensity = 1.0f;
 		float att = 0.5f;
