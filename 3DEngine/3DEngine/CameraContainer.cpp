@@ -35,6 +35,12 @@ void CameraContainer::AddCamera( std::unique_ptr<Camera> pCam )
 	cameras.push_back( std::move( pCam ) );
 }
 
+void CameraContainer::SetDirLightCamera( std::unique_ptr<Camera> pCam )
+{
+	dirLightOrthoCamera = pCam.get();
+	pCam.release();
+}
+
 Camera& CameraContainer::GetCamera()
 {
 	return *cameras[selected];
@@ -42,7 +48,7 @@ Camera& CameraContainer::GetCamera()
 
 Camera& CameraContainer::GetDirLightCamera()
 {
-	return *cameras[1];
+	return *dirLightOrthoCamera;
 }
 
 CameraContainer::~CameraContainer()
