@@ -46,20 +46,23 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     // normal to clip space
     normals = (normals * 2.0) - 1.0;
     
+    // world to camera 
     float4 worldDepth = float4(clipX, clipY, depthSample, 1.0);
     float4 worldPosition = mul(worldDepth, projInvMatrix);
     worldPosition /= worldPosition.w;
     float4 worldSpacePos = mul(worldPosition, cameraMatrix);
     worldSpacePos /= worldSpacePos.w;
     
-    float4 lightWorldPos = mul(worldSpacePos, lightMatrix);
-    lightWorldPos /= lightWorldPos.w;
-        
-    float4 depthSampleFromLight = depthTextureFromLight.Sample(SampleTypePoint, lightWorldPos.xy);  
+    // world to light and shadow map check
+    float4 fragPositionInLightView = mul(worldSpacePos, lightMatrix);
+    float fragDepth = fragPositionInLightView.z / fragPositionInLightView.w;
+    float sampleDepth = depthTextureFromLight.Sample(SampleTypePoint, (fragPositionInLightView.xy / fragPositionInLightView.w)).r;
     
-    if (depthSampleFromLight.r < lightWorldPos.z) //depthSample > test.z)
+    //return float4(sampleDepth, 0.0f, 0.0f, 1.0f);
+    if ( sampleDepth < fragDepth )
     {
-        //return colors * float4(.2, .2, .2, .2);
+        // placeholder shadow
+        return colors * float4(.2, .2, .2, 1.0);
     }
     
     // vector from camera to fragment

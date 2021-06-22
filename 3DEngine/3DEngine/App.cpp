@@ -23,6 +23,8 @@ App::App( const std::string& commandLine )
 	Orthogonal* pOrtho = new Orthogonal( 400.0f, 400.0f, 1.0f, 1200.0f );
 
 	cameras.AddCamera( std::make_unique<Camera>( "A", pPersp, dx::XMFLOAT3{ -13.5f,6.0f,3.5f }, 0.0f, PI / 2.0f ) );
+	cameras.AddCamera( std::make_unique<Camera>( "B", pOrtho, dx::XMFLOAT3{ 0.0f,200.8f,100.0f }, PI / 2.0f, -PI ) );
+
 	cameras.SetDirLightCamera( std::make_unique<Camera>( "B", pOrtho, dx::XMFLOAT3{ 0.0f,200.8f,100.0f }, PI / 2.0f, -PI ) );
 }
 
@@ -42,6 +44,7 @@ void App::DoFrame()
 	sponza.Draw( wnd.Gfx(), true );
 
 	// lighting pass
+	cameras.GetCamera().BindToGraphics( wnd.Gfx() );
 	dirLight.DrawDirLight( wnd.Gfx(), cameras.GetCamera().GetPos(),cameras.GetDirLightCamera().GetMatrix(),cameras.GetDirLightCamera().GetPos() );
 	light.DrawPointLight( wnd.Gfx(), cameras.GetCamera().GetMatrix(), cameras.GetCamera().GetPos() );
 

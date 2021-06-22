@@ -71,14 +71,15 @@ void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos , D
 
 	// get inverse of the projection matrix
 	DirectX::XMVECTOR determinant2 = DirectX::XMMatrixDeterminant( gfx.GetProjection() );
-	DirectX::XMMATRIX viewMatrix2 = DirectX::XMMatrixInverse( &determinant2, gfx.GetProjection() );
-	lbuf.projInvMatrix = viewMatrix2;
+	DirectX::XMMATRIX projInvMatrix = DirectX::XMMatrixInverse( &determinant2, gfx.GetProjection() );
+	lbuf.projInvMatrix = projInvMatrix;
 	pcs->Update( gfx, lbuf );
 
-	// update camera position
+	// update camera and light information
 	cambuf.camPos = camPos;
-	cambuf.lightMatrix = orthoMatrix;
 	cambuf.lightPos = lightPos;
+	cambuf.lightMatrix = orthoMatrix;//DirectX::XMMatrixMultiply( orthoMatrix, gfx.GetCamera() );
+
 	pcs2->Update( gfx, cambuf );
 
 	// bindables

@@ -23,7 +23,7 @@ Camera::~Camera()
 
 void Camera::BindToGraphics( Graphics& gfx ) const
 {
-	gfx.SetCamera( GetMatrix() );
+	gfx.SetCamera( proj->GetProjMatrix(pos,pitch,yaw) );
 	gfx.SetProjection( proj->GetMatrix() );
 }
 
@@ -95,4 +95,9 @@ DirectX::XMFLOAT3 Camera::GetPos() const noexcept
 const std::string& Camera::GetName() const noexcept
 {
 	return name;
+}
+
+Projection* Camera::GetProjection() const noexcept
+{
+	return proj;
 }

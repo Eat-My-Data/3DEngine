@@ -32,6 +32,23 @@ DirectX::XMMATRIX Perspective::GetMatrix() const
 	return DirectX::XMMatrixPerspectiveLH( width, height, nearZ, farZ );
 }
 
+DirectX::XMMATRIX Perspective::GetProjMatrix(DirectX::XMFLOAT3 pos,float pitch, float yaw) const
+{
+	using namespace DirectX;
+
+	const XMVECTOR forwardBaseVector = XMVectorSet( 0.0f, 0.0f, 1.0f, 0.0f );
+	// apply the camera rotations to a base vector
+	const auto lookVector = XMVector3Transform( forwardBaseVector,
+		XMMatrixRotationRollPitchYaw( pitch, yaw, 0.0f )
+	);
+	// generate camera transform (applied to all objects to arrange them relative
+	// to camera position/orientation in world) from cam position and direction
+	// camera "top" always faces towards +Y (cannot do a barrel roll)
+	const auto camPosition = XMLoadFloat3( &pos );
+	const auto camTarget = camPosition + lookVector;
+	return XMMatrixLookAtLH( camPosition, camTarget, XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f ) );
+}
+
 
 Orthogonal::Orthogonal( float width, float height, float nearZ, float farZ )
 	:
@@ -46,6 +63,24 @@ DirectX::XMMATRIX Orthogonal::GetMatrix() const
 	orthoMatrix.r[2].m128_f32[2] = 1.0f / ( farZ - nearZ );
 	orthoMatrix.r[3].m128_f32[2] = nearZ / ( nearZ - farZ );
 	return orthoMatrix;
+}
+
+DirectX::XMMATRIX Orthogonal::GetProjMatrix( DirectX::XMFLOAT3 pos, float pitch, float yaw ) const
+{
+	using namespace DirectX;
+
+	const XMVECTOR forwardBaseVector = XMVectorSet( 0.0f, 0.0f, 1.0f, 0.0f );
+	// apply the camera rotations to a base vector
+	const auto lookVector = XMVector3Transform( forwardBaseVector,
+		XMMatrixRotationRollPitchYaw( pitch, yaw, 0.0f )
+	);
+	// generate camera transform (applied to all objects to arrange them relative
+	// to camera position/orientation in world) from cam position and direction
+	// camera "top" always faces towards +Y (cannot do a barrel roll)
+	const auto camPosition = XMLoadFloat3( &pos );
+	const auto camTarget = camPosition + lookVector;
+	//return XMMatrixOrthographicLH(width,height,nearZ,farZ);
+	return XMMatrixLookAtLH( camPosition, camTarget, XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f ) );
 }
 
 

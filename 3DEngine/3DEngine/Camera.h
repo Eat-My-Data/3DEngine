@@ -18,6 +18,7 @@ public:
 	void Translate( DirectX::XMFLOAT3 translation ) noexcept;
 	DirectX::XMFLOAT3 GetPos() const noexcept;
 	const std::string& GetName() const noexcept;
+	Projection* GetProjection() const noexcept;
 private:
 	std::string name;
 	DirectX::XMFLOAT3 homePos;
