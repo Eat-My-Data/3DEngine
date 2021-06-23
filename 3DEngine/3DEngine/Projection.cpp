@@ -16,8 +16,8 @@ DirectX::XMMATRIX Projection::GetMatrix() const
 
 void Projection::RenderWidgets()
 {
-	ImGui::SliderFloat( "Width", &width, 0.01f, 4.0f );
-	ImGui::SliderFloat( "Height", &height, 0.01f, 4.0f );
+	ImGui::SliderFloat( "Width", &width, 0.1f, 400.0f );
+	ImGui::SliderFloat( "Height", &height, 0.1f, 400.0f );
 	ImGui::SliderFloat( "Near Z", &nearZ, 0.01f, 400.0f );
 	ImGui::SliderFloat( "Far Z", &farZ, 0.01f, 400.0f );
 }
@@ -32,7 +32,7 @@ DirectX::XMMATRIX Perspective::GetMatrix() const
 	return DirectX::XMMatrixPerspectiveLH( width, height, nearZ, farZ );
 }
 
-DirectX::XMMATRIX Perspective::GetProjMatrix(DirectX::XMFLOAT3 pos,float pitch, float yaw) const
+DirectX::XMMATRIX Perspective::GetCameraMatrix(DirectX::XMFLOAT3 pos,float pitch, float yaw) const
 {
 	using namespace DirectX;
 
@@ -57,15 +57,10 @@ Orthogonal::Orthogonal( float width, float height, float nearZ, float farZ )
 
 DirectX::XMMATRIX Orthogonal::GetMatrix() const
 {
-	DirectX::XMMATRIX orthoMatrix = DirectX::XMMatrixIdentity();
-	orthoMatrix.r[0].m128_f32[0] = 2.0f / width;
-	orthoMatrix.r[1].m128_f32[1] = 2.0f / height;
-	orthoMatrix.r[2].m128_f32[2] = 1.0f / ( farZ - nearZ );
-	orthoMatrix.r[3].m128_f32[2] = nearZ / ( nearZ - farZ );
-	return orthoMatrix;
+	return DirectX::XMMatrixOrthographicLH( width, height, nearZ, farZ );
 }
 
-DirectX::XMMATRIX Orthogonal::GetProjMatrix( DirectX::XMFLOAT3 pos, float pitch, float yaw ) const
+DirectX::XMMATRIX Orthogonal::GetCameraMatrix( DirectX::XMFLOAT3 pos, float pitch, float yaw ) const
 {
 	using namespace DirectX;
 

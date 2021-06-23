@@ -56,7 +56,7 @@ float4 main(float4 position : SV_POSITION, float2 tex : TEXCOORD) : SV_TARGET
     // world to light and shadow map check
     float4 fragPositionInLightView = mul(worldSpacePos, lightMatrix);
     float fragDepth = fragPositionInLightView.z / fragPositionInLightView.w;
-    float sampleDepth = depthTextureFromLight.Sample(SampleTypePoint, (fragPositionInLightView.xy / fragPositionInLightView.w)).r;
+    float sampleDepth = depthTextureFromLight.Sample(SampleTypePoint, ((fragPositionInLightView.xy / fragPositionInLightView.w) / 2.0f) + 0.5f).r;
     
     //return float4(sampleDepth, 0.0f, 0.0f, 1.0f);
     if ( sampleDepth < fragDepth )

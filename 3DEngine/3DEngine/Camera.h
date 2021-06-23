@@ -19,6 +19,7 @@ public:
 	DirectX::XMFLOAT3 GetPos() const noexcept;
 	const std::string& GetName() const noexcept;
 	Projection* GetProjection() const noexcept;
+	DirectX::XMMATRIX GetProjectionMatrix() const noexcept;
 private:
 	std::string name;
 	DirectX::XMFLOAT3 homePos;

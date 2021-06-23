@@ -49,7 +49,7 @@ DirectX::XMMATRIX DirectionalLight::GetTransformXM() const noexcept
 	return DirectX::XMMatrixTranslation( 1.0f, 1.0f, 1.0f );
 }
 
-void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos , DirectX::XMMATRIX orthoMatrix, DirectX::XMFLOAT3 lightPos )
+void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos , DirectX::XMMATRIX orthoMatrix, DirectX::XMMATRIX orthoCameraMatrix )
 {
 	// set render target
 	gfx.GetContext()->OMSetRenderTargets( 1, gfx.GetLightBuffer(), gfx.GetDSV_ReadOnlyDepth() );
@@ -77,8 +77,12 @@ void DirectionalLight::DrawDirLight( Graphics& gfx, DirectX::XMFLOAT3 camPos , D
 
 	// update camera and light information
 	cambuf.camPos = camPos;
-	cambuf.lightPos = lightPos;
-	cambuf.lightMatrix = orthoMatrix;//DirectX::XMMatrixMultiply( orthoMatrix, gfx.GetCamera() );
+	cambuf.lightPos = { 0.0,0.0,0.0 };
+
+	// CHECK MATRICES AND REWORK CAMERA
+	DirectX::XMVECTOR determinant3 = DirectX::XMMatrixDeterminant( orthoMatrix );
+	DirectX::XMMATRIX orthoViewInv = DirectX::XMMatrixInverse( &determinant3, orthoMatrix );
+	cambuf.lightMatrix = DirectX::XMMatrixMultiply( orthoCameraMatrix, orthoMatrix );
 
 	pcs2->Update( gfx, cambuf );
 

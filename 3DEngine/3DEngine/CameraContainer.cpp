@@ -7,7 +7,7 @@ void CameraContainer::SpawnWindow()
 {
 	if( ImGui::Begin( "Cameras" ) )
 	{
-		if( ImGui::BeginCombo( "Active Camera",cameras[selected]->GetName().c_str() ) )
+		/*if( ImGui::BeginCombo( "Active Camera",cameras[selected]->GetName().c_str() ) )
 		{
 			for( int i = 0; i < std::size( cameras ); i++ )
 			{
@@ -18,9 +18,10 @@ void CameraContainer::SpawnWindow()
 				}
 			}
 			ImGui::EndCombo();
-		}
+		}*/
 
-		GetCamera().SpawnControlWidgets();
+		//GetCamera().SpawnControlWidgets();
+		GetDirLightCamera().SpawnControlWidgets();
 	}
 	ImGui::End();
 }
